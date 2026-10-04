@@ -151,23 +151,26 @@
     }
 
     .board-area {
-      position: relative;
       min-width: 0;
+    }
+
+    /* Right column: reference on top, tray below */
+    .side-column {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      min-width: 0;
+      min-height: 0;
     }
 
     /* Reference panel */
     .reference-panel {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 230px;
       padding: 0.9rem;
       border-radius: 14px;
       background: var(--glass);
       border: 1px solid rgba(242, 193, 78, 0.22);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      z-index: 5;
     }
 
     .reference-title {
@@ -276,6 +279,7 @@
     .tray-panel {
       display: flex;
       flex-direction: column;
+      flex: 1;
       min-height: 0;
       border-radius: 18px;
       background: var(--glass);
@@ -490,10 +494,8 @@
       }
 
       .reference-panel {
-        position: static;
         width: 100%;
-        max-width: 320px;
-        margin-bottom: 1rem;
+        max-width: 360px;
       }
     }
 
@@ -536,17 +538,6 @@
 
   <main class="puzzle-layout">
     <section class="board-area">
-      <div class="reference-panel">
-        <div class="reference-title">原图参考</div>
-        <img src="assets/hero-combined.png" alt="竹林七贤与荣启期拼砖画原图" class="reference-img" />
-        <p class="reference-tip">请把右侧碎片拼成左上角这张完整的拼砖画。</p>
-        <div class="gesture-guide">
-          <strong>操作方式</strong><br />
-          · 鼠标 / 手指：按住碎片拖到正确位置<br />
-          · 手势：食指选中，张开手掌移动，握拳嵌入
-        </div>
-      </div>
-
       <div class="board-wrap">
         <div id="board" class="board">
           <div class="board-bg"></div>
@@ -557,12 +548,25 @@
       </div>
     </section>
 
-    <aside class="tray-panel">
-      <div class="tray-header">
-        <span>碎片栏</span>
-        <span id="trayCount" class="tray-count">0 / 20</span>
+    <aside class="side-column">
+      <div class="reference-panel">
+        <div class="reference-title">原图参考</div>
+        <img src="assets/hero-combined.png" alt="竹林七贤与荣启期拼砖画原图" class="reference-img" />
+        <p class="reference-tip">请参照这张原图，将下方碎片拼成完整的拼砖画。</p>
+        <div class="gesture-guide">
+          <strong>操作方式</strong><br />
+          · 鼠标 / 手指：按住碎片拖到正确位置<br />
+          · 手势：食指选中，张开手掌移动，握拳嵌入
+        </div>
       </div>
-      <div id="tray" class="tray"></div>
+
+      <div class="tray-panel">
+        <div class="tray-header">
+          <span>碎片栏</span>
+          <span id="trayCount" class="tray-count">0 / 20</span>
+        </div>
+        <div id="tray" class="tray"></div>
+      </div>
     </aside>
   </main>
 
