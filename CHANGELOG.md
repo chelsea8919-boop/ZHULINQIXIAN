@@ -1,5 +1,15 @@
 # 变更日志
 
+## v4.1 - 2026-10-04 21:20
+- 修复手势开启失败的问题：
+  - 本地化手势模型：下载 `assets/hand_landmarker.task`（约 7.5MB）到项目内，优先加载本地模型，避免在线 GCS 模型文件加载缓慢或失败导致初始化卡死
+  - MediaPipe 视觉模块增加多 CDN 回退（jsDelivr → unpkg → fastly jsDelivr）并加 15 秒加载超时，失败时明确提示
+  - 增加 `navigator.mediaDevices` 不存在时的友好报错（file:// 等环境不支持摄像头）
+  - 细分摄像头异常提示：权限被拒 / 无设备 / 设备被占用（NotReadableError）分别给出不同说明
+  - 模型加载期间按钮禁用并显示"加载手势模型…"，防止重复点击
+  - 骨架绘制改用模块导出的 `HAND_CONNECTIONS`，视频流增加 onerror 监听
+- 变更文件：`puzzle.html`、`assets/hand_landmarker.task`（新增）
+
 ## v4.0 - 2026-10-04 21:05
 - 手势识别迁移至 MediaPipe Tasks Vision（HandLandmarker 手部关键点模型），替代已废弃的旧版 @mediapipe/hands 方案：
   - 通过 CDN 动态加载 `@mediapipe/tasks-vision@0.10.14` 与官方 hand_landmarker 模型，GPU 推理失败自动回退 CPU

@@ -871,9 +871,17 @@
   <script type="module">
     /* ====================== MediaPipe Tasks Vision 手势控制 ====================== */
     const VISION_BASE = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
+    const VISION_FALLBACKS = [
+      'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14',
+      'https://unpkg.com/@mediapipe/tasks-vision@0.10.14',
+      'https://fastly.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14'
+    ];
+    const MODEL_LOCAL = 'assets/hand_landmarker.task';
     const MODEL_URL = 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task';
+    const MODEL_SIZE_HINT = '（约 7.5MB，请耐心等待）';
 
     window.__gestureModuleLoaded = true;
+    window.__gestureModelStatus = 'idle';
 
     const gestureBtn = document.getElementById('gestureBtn');
     const gestureStatus = document.getElementById('gestureStatus');
@@ -885,7 +893,9 @@
 
     let HandLandmarkerRef = null;
     let DrawingUtilsRef = null;
+    let HAND_CONNECTIONS = null;
     let handLandmarker = null;
+    let visionModule = null;
     let stream = null;
     let running = false;
     let lastVideoTime = -1;
@@ -899,22 +909,71 @@
       }
     });
 
+    function importWithTimeout(url, ms) {
+      return Promise.race([
+        import(url),
+        new Promise(function (_, reject) {
+          setTimeout(function () { reject(new Error('CDN 加载超时（' + url + '）')); }, ms);
+        })
+      ]);
+    }
+
+    async function loadVisionModule() {
+      if (visionModule) return visionModule;
+      let lastErr = null;
+      for (const base of VISION_FALLBACKS) {
+        try {
+          visionModule = await importWithTimeout(base + '/vision_bundle.mjs', 15000);
+          return visionModule;
+        } catch (e) {
+          lastErr = e;
+        }
+      }
+      throw new Error('MediaPipe 视觉模块加载失败（CDN 均不可达）：' + (lastErr && lastErr.message ? lastErr.message : lastErr));
+    }
+
+    async function resolveModelSource() {
+      // 优先本地模型文件（秒级加载），失败再退回在线模型
+      try {
+        if (location.protocol === 'file:' || location.protocol === 'http:' || location.protocol === 'https:') {
+          const res = await fetch(MODEL_LOCAL);
+          if (res.ok) {
+            const buf = await res.arrayBuffer();
+            if (buf.byteLength > 1000000) {
+              console.info('使用本地手势模型：' + MODEL_LOCAL);
+              return MODEL_LOCAL;
+            }
+            console.warn('本地模型文件无效，改用在线模型');
+          }
+        }
+      } catch (e) {
+        console.warn('本地模型不可用，改用在线模型：', e);
+      }
+      return MODEL_URL;
+    }
+
     async function startGesture() {
       if (running) return;
+      window.__gestureModelStatus = 'loading';
       try {
-        gestureBtn.textContent = '关闭手势控制';
-        gestureStatus.textContent = '正在加载手势模型…';
+        gestureBtn.textContent = '加载手势模型…';
+        gestureBtn.disabled = true;
+        gestureStatus.textContent = '正在加载 MediaPipe 视觉模块…' + MODEL_SIZE_HINT;
 
         if (!handLandmarker) {
-          const vision = await import(`${VISION_BASE}/vision_bundle.mjs`);
+          const vision = await loadVisionModule();
           HandLandmarkerRef = vision.HandLandmarker;
           DrawingUtilsRef = vision.DrawingUtils;
+          HAND_CONNECTIONS = vision.HandLandmarker.HAND_CONNECTIONS;
 
-          const fileset = await vision.FilesetResolver.forVisionTasks(`${VISION_BASE}/wasm`);
+          gestureStatus.textContent = '正在初始化手势模型…' + MODEL_SIZE_HINT;
+          const modelSrc = await resolveModelSource();
+
+          const fileset = await vision.FilesetResolver.forVisionTasks(VISION_BASE + '/wasm');
           const create = function (delegate) {
             return HandLandmarkerRef.createFromOptions(fileset, {
               baseOptions: {
-                modelAssetPath: MODEL_URL,
+                modelAssetPath: modelSrc,
                 delegate: delegate
               },
               runningMode: 'VIDEO',
@@ -923,12 +982,19 @@
               minTrackingConfidence: 0.6
             });
           };
+          let created = null;
           try {
-            handLandmarker = await create('GPU');
+            created = await create('GPU');
           } catch (gpuErr) {
             console.warn('GPU 推理不可用，回退到 CPU：', gpuErr);
-            handLandmarker = await create('CPU');
+            created = await create('CPU');
           }
+          handLandmarker = created;
+          window.__gestureModelStatus = 'ok';
+        }
+
+        if (!navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== 'function') {
+          throw new Error('当前环境不支持摄像头（需在 https 或 localhost 环境运行，并允许摄像头权限）');
         }
 
         gestureStatus.textContent = '正在开启摄像头…';
@@ -937,18 +1003,25 @@
           audio: false
         });
         inputVideo.srcObject = stream;
+        inputVideo.onerror = function () {
+          console.error('视频流播放失败');
+        };
         await inputVideo.play();
 
         videoPreview.classList.add('active');
         virtualCursor.classList.add('active');
         running = true;
         lastVideoTime = -1;
+        gestureBtn.textContent = '关闭手势控制';
+        gestureBtn.disabled = false;
         gestureStatus.textContent = '手势控制已开启';
         requestAnimationFrame(loop);
       } catch (err) {
-        console.error(err);
+        console.error('手势开启失败：', err);
+        window.__gestureModelStatus = 'error';
         running = false;
         gestureBtn.textContent = '开启手势控制';
+        gestureBtn.disabled = false;
         videoPreview.classList.remove('active');
         virtualCursor.classList.remove('active');
         if (stream) {
@@ -956,19 +1029,26 @@
           stream = null;
         }
         inputVideo.srcObject = null;
-        if (err && (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError')) {
-          gestureStatus.textContent = '摄像头权限被拒绝，请在浏览器中允许后重试';
+        if (err && (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError' || /Permission|denied/i.test(err.message || ''))) {
+          gestureStatus.textContent = '摄像头权限被拒绝：请在浏览器地址栏/站点设置中允许摄像头后重试';
         } else if (err && err.name === 'NotFoundError') {
           gestureStatus.textContent = '未检测到摄像头设备';
+        } else if (err && err.name === 'NotReadableError') {
+          gestureStatus.textContent = '摄像头被其他程序占用，请关闭占用程序后重试';
+        } else if (err && /CDN|模块/i.test(err.message || '')) {
+          gestureStatus.textContent = '手势模块加载失败（CDN 不可达），请检查网络后刷新重试';
         } else {
-          gestureStatus.textContent = '手势开启失败：' + (err && err.message ? err.message : '请检查网络与摄像头');
+          gestureStatus.textContent = '手势开启失败：' + (err && err.message ? err.message : '未知错误');
         }
+      } finally {
+        if (!running) gestureBtn.disabled = false;
       }
     }
 
-    function stopGesture() {
+    async function stopGesture() {
       running = false;
       gestureBtn.textContent = '开启手势控制';
+      gestureBtn.disabled = false;
       videoPreview.classList.remove('active');
       virtualCursor.classList.remove('active');
       gestureStatus.textContent = '手势控制未开启';
@@ -981,6 +1061,7 @@
       inputVideo.srcObject = null;
       gestureBuffer = [];
       lastVideoTime = -1;
+      window.__gestureModelStatus = 'idle';
     }
 
     function loop() {
@@ -1014,9 +1095,9 @@
       const lm = lms[0];
 
       // 绘制手部骨架
-      if (DrawingUtilsRef && HandLandmarkerRef) {
+      if (DrawingUtilsRef && HAND_CONNECTIONS) {
         const du = new DrawingUtilsRef(ctx);
-        du.drawConnectors(lm, HandLandmarkerRef.HAND_CONNECTIONS, {
+        du.drawConnectors(lm, HAND_CONNECTIONS, {
           color: '#8eebae',
           lineWidth: 2
         });
