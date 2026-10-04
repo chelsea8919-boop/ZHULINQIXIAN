@@ -1,5 +1,16 @@
 # 变更日志
 
+## v4.2 - 2026-10-04 21:35
+- 手势模型完全本地化，运行期不再依赖任何境外 CDN，国内任何环境均可正常运行：
+  - 下载 `assets/mediapipe/vision_bundle.mjs`（134KB ESM 模块）
+  - 下载 `assets/mediapipe/wasm/vision_wasm_internal.js`（205KB）+ `vision_wasm_internal.wasm`（9.2MB）
+  - 本地模型 `assets/hand_landmarker.task`（7.5MB）v4.1 已下载
+  - 总计约 17MB 本地资源，首次加载后无需网络
+- 移除所有境外 CDN 引用（jsDelivr / unpkg / fastly / storage.googleapis.com），`vision_bundle.mjs` 与 WASM 文件均由本地 `import()` 和 `FilesetResolver` 读取
+- `file://` 协议下（双击打开）检测到则提前拦截，提示需部署到 GitHub Pages 或用本地 HTTP 服务器（如 `python -m http.server`）
+- 拼图框左上角新增三种手势说明卡片：☝️食指伸出=选中碎片 / 🖐️五指张开=随手掌移动 / ✊握拳=放下嵌入
+- 变更文件：`puzzle.html`、`assets/mediapipe/`（新增）
+
 ## v4.1 - 2026-10-04 21:20
 - 修复手势开启失败的问题：
   - 本地化手势模型：下载 `assets/hand_landmarker.task`（约 7.5MB）到项目内，优先加载本地模型，避免在线 GCS 模型文件加载缓慢或失败导致初始化卡死

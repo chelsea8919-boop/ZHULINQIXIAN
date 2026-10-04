@@ -258,17 +258,56 @@
       margin: 0 auto;
     }
 
-    .board {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 1600 / 1100;
-      border-radius: 18px;
-      overflow: hidden;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--glass-border);
-      box-shadow:
-        0 30px 90px rgba(0, 0, 0, 0.45),
-        inset 0 0 80px rgba(2, 20, 10, 0.5);
+      .board {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1600 / 1100;
+        border-radius: 18px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--glass-border);
+        box-shadow:
+          0 30px 90px rgba(0, 0, 0, 0.45),
+          inset 0 0 80px rgba(2, 20, 10, 0.5);
+      }
+
+    /* 拼图框左上角：手势说明 */
+    .gesture-hints {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 50;
+      padding: 0.55rem 0.75rem;
+      border-radius: 10px;
+      background: rgba(2, 15, 9, 0.72);
+      border: 1px solid rgba(255, 215, 110, 0.25);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      pointer-events: none;
+    }
+
+    .gesture-hints h3 {
+      font-family: "Noto Serif SC", serif;
+      font-size: 0.8rem;
+      color: var(--gold-300);
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.06em;
+    }
+
+    .gesture-hints ul {
+      list-style: none;
+      font-size: 0.72rem;
+      color: var(--green-200);
+      line-height: 1.75;
+    }
+
+    .gesture-hints .g-name {
+      color: var(--gold-400);
+      font-weight: 600;
+    }
+
+    .gesture-hints .g-emoji {
+      margin-right: 0.25rem;
     }
 
     .board-bg {
@@ -532,6 +571,15 @@
           <div class="board-grid"></div>
           <div id="targetCells"></div>
           <div id="boardPieces"></div>
+          <!-- 拼图框左上角：三种手势说明 -->
+          <div class="gesture-hints">
+            <h3>手势操作说明</h3>
+            <ul>
+              <li><span class="g-emoji">☝️</span><span class="g-name">食指伸出</span>　选中目标碎片</li>
+              <li><span class="g-emoji">🖐️</span><span class="g-name">五指张开</span>　碎片随手掌移动</li>
+              <li><span class="g-emoji">✊</span><span class="g-name">握拳</span>　放下并嵌入碎片</li>
+            </ul>
+          </div>
         </div>
       </div>
     </section>
@@ -859,26 +907,21 @@
       /* ====================== 启动 ====================== */
       createPieces();
 
-      // 手势模块加载兜底提示（模块脚本从 CDN 动态加载）
+      // 手势模块兜底提示（本地资源加载失败时）
       setTimeout(function () {
         if (!window.__gestureModuleLoaded) {
-          gestureStatus.textContent = '手势模块加载失败，请检查网络后刷新重试';
+          gestureStatus.textContent = '手势模块脚本未加载，请刷新页面重试';
         }
-      }, 8000);
+      }, 5000);
     })();
   </script>
 
   <script type="module">
-    /* ====================== MediaPipe Tasks Vision 手势控制 ====================== */
-    const VISION_BASE = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
-    const VISION_FALLBACKS = [
-      'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14',
-      'https://unpkg.com/@mediapipe/tasks-vision@0.10.14',
-      'https://fastly.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14'
-    ];
-    const MODEL_LOCAL = 'assets/hand_landmarker.task';
-    const MODEL_URL = 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task';
-    const MODEL_SIZE_HINT = '（约 7.5MB，请耐心等待）';
+    /* ====================== MediaPipe Tasks Vision 手势控制（全本地化，无需网络） ====================== */
+    // 所有资源均本地化，运行期不依赖任何 CDN
+    const VISION_LOCAL = './assets/mediapipe/vision_bundle.mjs';
+    const WASM_LOCAL   = './assets/mediapipe/wasm';
+    const MODEL_LOCAL  = 'assets/hand_landmarker.task';
 
     window.__gestureModuleLoaded = true;
     window.__gestureModelStatus = 'idle';
@@ -909,47 +952,10 @@
       }
     });
 
-    function importWithTimeout(url, ms) {
-      return Promise.race([
-        import(url),
-        new Promise(function (_, reject) {
-          setTimeout(function () { reject(new Error('CDN 加载超时（' + url + '）')); }, ms);
-        })
-      ]);
-    }
-
     async function loadVisionModule() {
       if (visionModule) return visionModule;
-      let lastErr = null;
-      for (const base of VISION_FALLBACKS) {
-        try {
-          visionModule = await importWithTimeout(base + '/vision_bundle.mjs', 15000);
-          return visionModule;
-        } catch (e) {
-          lastErr = e;
-        }
-      }
-      throw new Error('MediaPipe 视觉模块加载失败（CDN 均不可达）：' + (lastErr && lastErr.message ? lastErr.message : lastErr));
-    }
-
-    async function resolveModelSource() {
-      // 优先本地模型文件（秒级加载），失败再退回在线模型
-      try {
-        if (location.protocol === 'file:' || location.protocol === 'http:' || location.protocol === 'https:') {
-          const res = await fetch(MODEL_LOCAL);
-          if (res.ok) {
-            const buf = await res.arrayBuffer();
-            if (buf.byteLength > 1000000) {
-              console.info('使用本地手势模型：' + MODEL_LOCAL);
-              return MODEL_LOCAL;
-            }
-            console.warn('本地模型文件无效，改用在线模型');
-          }
-        }
-      } catch (e) {
-        console.warn('本地模型不可用，改用在线模型：', e);
-      }
-      return MODEL_URL;
+      visionModule = await import(VISION_LOCAL);
+      return visionModule;
     }
 
     async function startGesture() {
@@ -958,22 +964,30 @@
       try {
         gestureBtn.textContent = '加载手势模型…';
         gestureBtn.disabled = true;
-        gestureStatus.textContent = '正在加载 MediaPipe 视觉模块…' + MODEL_SIZE_HINT;
+        gestureStatus.textContent = '正在检查运行环境…';
 
+        // file:// 协议下 WASM 引擎无法加载（CORS 限制），提前拦截并给出明确提示
+        if (location.protocol === 'file:') {
+          throw new Error(
+            '手势控制必须在 Web 服务器环境下运行。请将本项目部署到 GitHub Pages 或用本地 HTTP 服务器（如 python -m http.server）访问，不能直接双击打开。'
+          );
+        }
+
+        gestureStatus.textContent = '正在加载本地手势模型…';
         if (!handLandmarker) {
           const vision = await loadVisionModule();
           HandLandmarkerRef = vision.HandLandmarker;
           DrawingUtilsRef = vision.DrawingUtils;
           HAND_CONNECTIONS = vision.HandLandmarker.HAND_CONNECTIONS;
 
-          gestureStatus.textContent = '正在初始化手势模型…' + MODEL_SIZE_HINT;
-          const modelSrc = await resolveModelSource();
+          gestureStatus.textContent = '正在初始化手势模型（本地推理引擎）…';
+          // 本地 WASM 路径
+          const fileset = await vision.FilesetResolver.forVisionTasks(WASM_LOCAL);
 
-          const fileset = await vision.FilesetResolver.forVisionTasks(VISION_BASE + '/wasm');
           const create = function (delegate) {
             return HandLandmarkerRef.createFromOptions(fileset, {
               baseOptions: {
-                modelAssetPath: modelSrc,
+                modelAssetPath: MODEL_LOCAL,
                 delegate: delegate
               },
               runningMode: 'VIDEO',
@@ -1035,8 +1049,8 @@
           gestureStatus.textContent = '未检测到摄像头设备';
         } else if (err && err.name === 'NotReadableError') {
           gestureStatus.textContent = '摄像头被其他程序占用，请关闭占用程序后重试';
-        } else if (err && /CDN|模块/i.test(err.message || '')) {
-          gestureStatus.textContent = '手势模块加载失败（CDN 不可达），请检查网络后刷新重试';
+        } else if (err && /Failed to fetch|Importing a module|ERR_|wasm/i.test(err.message || '')) {
+          gestureStatus.textContent = '本地手势资源加载失败（assets/mediapipe 文件缺失），请刷新页面重试';
         } else {
           gestureStatus.textContent = '手势开启失败：' + (err && err.message ? err.message : '未知错误');
         }
