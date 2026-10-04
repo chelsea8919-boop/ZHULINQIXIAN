@@ -1,5 +1,5 @@
-from PIL import Image, ImageOps, ImageFilter, ImageDraw
-import os, random
+from PIL import Image, ImageOps, ImageDraw, ImageEnhance
+import os
 
 base = "C:/Users/Ms.赵/WorkBuddy/2026-10-04-task-9/assets"
 p1 = os.path.join(base, "拼1.png")
@@ -9,7 +9,7 @@ out = os.path.join(base, "hero-combined.png")
 i1 = Image.open(p1).convert("RGBA")
 i2 = Image.open(p2).convert("RGBA")
 
-target_w = 1400
+target_w = 1600
 
 def scale_to_width(img, w):
     ratio = w / img.width
@@ -20,41 +20,42 @@ s1 = scale_to_width(i1, target_w)
 s2 = scale_to_width(i2, target_w)
 
 combined_h = s1.height + s2.height
-combined = Image.new("RGBA", (target_w, combined_h), (232, 242, 229, 255))
-# paste centered vertically? both scaled to same width, so x=0
+combined = Image.new("RGBA", (target_w, combined_h), (235, 243, 232, 255))
 combined.paste(s1, (0, 0), s1)
 combined.paste(s2, (0, s1.height), s2)
 
-# Convert to RGB then grayscale
+# Convert to grayscale, then colorize with a bamboo-green duotone
 gray = combined.convert("RGB").convert("L")
-
-# Colorize: dark tones -> deep bamboo green, light tones -> pale celadon
-line_green = (18, 55, 35)        # 深竹绿
-paper_green = (228, 240, 224)    # 瓷青纸色
+line_green = (26, 112, 64)        # 鲜竹绿，用于线条
+paper_green = (232, 250, 226)    # 亮青纸色，用于背景
 colorized = ImageOps.colorize(gray, line_green, paper_green)
 
-# Add a subtle green vignette
+# Build a subtle radial vignette: center stays clear, edges gently darken
 vignette = Image.new("L", (target_w, combined_h), 0)
 draw = ImageDraw.Draw(vignette)
 cx, cy = target_w // 2, combined_h // 2
 max_r = int((target_w**2 + combined_h**2) ** 0.5 / 2)
-for r in range(max_r, 0, -4):
-    alpha = int(255 * (r / max_r) ** 1.4)
+# Draw from outside in: outer rings are bright (more overlay), inner rings are dark (no overlay)
+for r in range(max_r, 0, -3):
+    alpha = int(90 * ((r / max_r) ** 2.0))
     draw.ellipse([cx-r, cy-r, cx+r, cy+r], fill=alpha)
-# Invert so edges are darker
-vignette = ImageOps.invert(vignette)
-# Apply vignette as an overlay with low opacity
-vignette_color = Image.new("RGB", (target_w, combined_h), (10, 35, 20))
-result = Image.composite(vignette_color, colorized, vignette)
 
-# Add a very faint grain/noise texture for museum relic feel
-noise = Image.effect_noise((target_w, combined_h), 8).convert("L")
-noise = noise.point(lambda x: x if x > 220 else 0)  # mostly transparent, sparse specks
-noise_color = Image.new("RGB", (target_w, combined_h), (35, 70, 45))
+# Composite a dark green overlay only where the vignette mask is bright (edges)
+edge_color = Image.new("RGB", (target_w, combined_h), (30, 92, 52))
+result = Image.composite(edge_color, colorized, vignette)
+
+# Very faint grain for relic texture
+noise = Image.effect_noise((target_w, combined_h), 10).convert("L")
+noise = noise.point(lambda x: x if x > 235 else 0)
+noise_color = Image.new("RGB", (target_w, combined_h), (70, 135, 85))
 result = Image.composite(noise_color, result, noise)
 
-# Slight contrast boost
-result = ImageOps.autocontrast(result, cutoff=0.5)
+# Boost brightness and color to make the green tones feel fresher
+result = ImageEnhance.Brightness(result).enhance(1.06)
+result = ImageEnhance.Color(result).enhance(1.18)
+
+# Gentle autocontrast to keep tones clean
+result = ImageOps.autocontrast(result, cutoff=0.3)
 
 result.save(out, "PNG")
 print("Saved", out, result.size)
