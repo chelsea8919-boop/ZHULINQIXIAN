@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>竹林七贤 · 拼砖画数字展厅</title>
+  <meta name="description" content="竹林七贤与荣启期拼砖画——六朝墓室砖画珍品科普宣传页" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --green-950: #020f09;
+      --green-900: #04140c;
+      --green-800: #0b2618;
+      --green-700: #153c25;
+      --green-600: #25633f;
+      --green-500: #3d8f5e;
+      --green-300: #8ecba6;
+      --green-100: #d8ecd9;
+      --text: #e8f3eb;
+      --muted: #9cb0a3;
+      --glass: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.10);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--green-950);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* Navigation */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 4vw;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background: linear-gradient(180deg, rgba(4, 20, 12, 0.85), rgba(4, 20, 12, 0.45));
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .logo {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--green-100);
+      letter-spacing: 0.08em;
+    }
+
+    .logo span {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.7rem;
+      color: var(--green-300);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 0.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      border-radius: 999px;
+      transition: color 0.25s ease, background 0.25s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--green-100);
+      background: var(--glass);
+    }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 35%, rgba(15, 60, 35, 0.6) 0%, rgba(2, 15, 9, 0.95) 75%),
+        var(--green-950);
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(142, 203, 166, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(142, 203, 166, 0.04) 1px, transparent 1px);
+      background-size: 70px 70px;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .hero-particles {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .hero-vignette {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 45%, rgba(2, 15, 9, 0) 0%, rgba(2, 15, 9, 0.55) 70%),
+        linear-gradient(180deg, rgba(2, 15, 9, 0.35) 0%, rgba(2, 15, 9, 0.55) 100%);
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    .hero-tint {
+      position: absolute;
+      inset: 0;
+      background: rgba(45, 120, 75, 0.07);
+      mix-blend-mode: soft-light;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .hero-image-wrapper {
+      position: relative;
+      z-index: 1;
+      width: 92%;
+      max-width: 1600px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: translate(calc(var(--mx, 0) * -18px), calc(var(--my, 0) * -18px));
+      transition: transform 0.15s linear;
+    }
+
+    .hero-image {
+      width: 100%;
+      height: auto;
+      max-height: 78vh;
+      object-fit: contain;
+      filter: contrast(1.05) saturate(0.95);
+      animation: heroFloat 14s ease-in-out infinite;
+      transform-origin: center center;
+    }
+
+    @keyframes heroFloat {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-14px) scale(1.012); }
+    }
+
+    .hero-content {
+      position: absolute;
+      bottom: 8vh;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      text-align: center;
+      width: min(90%, 900px);
+      padding: 2rem;
+      border-radius: 20px;
+      background: var(--glass);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      color: var(--green-300);
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .hero-tag::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green-300);
+      box-shadow: 0 0 10px var(--green-300);
+      animation: pulse 2.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(142, 203, 166, 0.4); }
+      50% { opacity: 0.7; box-shadow: 0 0 0 8px rgba(142, 203, 166, 0); }
+    }
+
+    .hero-title {
+      font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+      font-size: clamp(2.2rem, 6vw, 4.5rem);
+      font-weight: 700;
+      line-height: 1.15;
+      color: var(--green-100);
+      margin-bottom: 0.75rem;
+      letter-spacing: 0.06em;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(0.95rem, 2vw, 1.15rem);
+      color: var(--muted);
+      font-weight: 300;
+      max-width: 680px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 2rem;
+      border-radius: 999px;
+      border: 1px solid var(--green-500);
+      background: rgba(61, 143, 94, 0.12);
+      color: var(--green-100);
+      text-decoration: none;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      transition: background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .hero-cta:hover {
+      background: rgba(61, 143, 94, 0.28);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(61, 143, 94, 0.25);
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+      color: var(--muted);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      opacity: 0.8;
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(180deg, var(--green-300), transparent);
+      animation: scrollDown 2s ease-in-out infinite;
+    }
+
+    @keyframes scrollDown {
+      0%, 100% { transform: scaleY(1); opacity: 0.6; }
+      50% { transform: scaleY(0.6); opacity: 0.2; }
+    }
+
+    /* Main content */
+    main {
+      position: relative;
+      z-index: 20;
+      background: var(--green-900);
+    }
+
+    .section {
+      padding: 6rem 4vw;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-weight: 600;
+      color: var(--green-100);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-title::before {
+      content: "";
+      width: 4px;
+      height: 1em;
+      background: var(--green-500);
+      border-radius: 2px;
+    }
+
+    .section-desc {
+      color: var(--muted);
+      max-width: 760px;
+      margin-bottom: 2.5rem;
+      font-weight: 300;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .card {
+      padding: 1.75rem;
+      border-radius: 16px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(142, 203, 166, 0.35);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .card-label {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.7rem;
+      color: var(--green-300);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .card h3 {
+      font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+      font-size: 1.15rem;
+      color: var(--green-100);
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .card p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    .sages-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1.25rem;
+    }
+
+    .sage-tag {
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      background: rgba(61, 143, 94, 0.12);
+      border: 1px solid rgba(61, 143, 94, 0.35);
+      color: var(--green-100);
+      font-size: 0.9rem;
+      transition: background 0.2s ease;
+    }
+
+    .sage-tag:hover {
+      background: rgba(61, 143, 94, 0.25);
+    }
+
+    /* Footer */
+    footer {
+      padding: 3rem 4vw;
+      text-align: center;
+      border-top: 1px solid var(--glass-border);
+      color: var(--muted);
+      font-size: 0.85rem;
+      background: var(--green-950);
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .hero-content { padding: 1.5rem; bottom: 6vh; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="logo">竹林七贤 <span>Digital Museum</span></div>
+    <ul class="nav-links">
+      <li><a href="#home">首页</a></li>
+      <li><a href="#about">拼砖画</a></li>
+      <li><a href="#sages">七贤</a></li>
+      <li><a href="#visit">观展</a></li>
+    </ul>
+  </nav>
+
+  <header id="home" class="hero">
+    <div class="hero-grid"></div>
+    <canvas class="hero-particles" id="particles"></canvas>
+    <div class="hero-vignette"></div>
+    <div class="hero-tint"></div>
+
+    <div class="hero-image-wrapper" id="heroWrapper">
+      <img src="assets/hero-combined.png" alt="竹林七贤与荣启期拼砖画" class="hero-image" />
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-tag">Exhibit 01 / 六朝砖画</div>
+      <h1 class="hero-title">竹林七贤 · 拼砖画</h1>
+      <p class="hero-subtitle">
+        以砖为纸，以刀为笔。两幅画像砖上下相接，再现魏晋风骨与林下清谈。
+      </p>
+      <a href="#about" class="hero-cta">进入数字展厅</a>
+    </div>
+
+    <div class="scroll-hint">
+      <span>SCROLL</span>
+      <div class="scroll-line"></div>
+    </div>
+  </header>
+
+  <main>
+    <section id="about" class="section">
+      <h2 class="section-title">关于拼砖画</h2>
+      <p class="section-desc">
+        《竹林七贤与荣启期》拼砖画出土于南京西善桥南朝墓，由数百块画像砖拼嵌而成，是中国现存最早的魏晋人物画实物之一。
+      </p>
+      <div class="cards">
+        <div class="card">
+          <div class="card-label">Period</div>
+          <h3>六朝 / 南朝</h3>
+          <p>约公元 5 世纪，砖画生动呈现了魏晋名士的生活场景与精神气质。</p>
+        </div>
+        <div class="card">
+          <div class="card-label">Material</div>
+          <h3>画像砖拼嵌</h3>
+          <p>以模印砖画为基础，按编号顺序拼合，形成两幅对称的横向长卷。</p>
+        </div>
+        <div class="card">
+          <div class="card-label">Theme</div>
+          <h3>林下清谈</h3>
+          <p>七贤席地而坐，或抚琴、或饮酒、或论道，松竹掩映，气韵高古。</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="sages" class="section">
+      <h2 class="section-title">七贤名录</h2>
+      <p class="section-desc">
+        嵇康、阮籍、山涛、王戎、向秀、刘伶、阮咸，七位魏晋名士，各尽其态，各具风神。
+      </p>
+      <div class="sages-list">
+        <span class="sage-tag">嵇康</span>
+        <span class="sage-tag">阮籍</span>
+        <span class="sage-tag">山涛</span>
+        <span class="sage-tag">王戎</span>
+        <span class="sage-tag">向秀</span>
+        <span class="sage-tag">刘伶</span>
+        <span class="sage-tag">阮咸</span>
+        <span class="sage-tag">荣启期</span>
+      </div>
+    </section>
+
+    <section id="visit" class="section">
+      <h2 class="section-title">观展信息</h2>
+      <p class="section-desc">
+        本页为科普宣传首页，后续可接入交互式砖画拆分、人物热点讲解与藏品 3D 展示模块。
+      </p>
+      <div class="cards">
+        <div class="card">
+          <div class="card-label">Location</div>
+          <h3>南京博物院</h3>
+          <p>原作珍藏于南京博物院历史馆，是中国首批禁止出国（境）展览文物之一。</p>
+        </div>
+        <div class="card">
+          <div class="card-label">Status</div>
+          <h3>数字展厅建设中</h3>
+          <p>当前版本为纯前端首页demo，包含大图拼接、浮动效果与响应式布局。</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>竹林七贤 · 拼砖画数字展厅 &copy; 2026 | 纯前端科普宣传页</p>
+  </footer>
+
+  <script>
+    // Mouse parallax for the hero image wrapper
+    const hero = document.querySelector('.hero');
+    document.addEventListener('mousemove', (e) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 2;
+      const y = (e.clientY / window.innerHeight - 0.5) * 2;
+      hero.style.setProperty('--mx', x.toFixed(3));
+      hero.style.setProperty('--my', y.toFixed(3));
+    });
+
+    // Particle system: floating green dust
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let width, height;
+
+    function resizeCanvas() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+    }
+
+    function createParticles() {
+      const count = Math.min(80, Math.floor((width * height) / 16000));
+      particles = [];
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          r: Math.random() * 1.5 + 0.5,
+          vx: (Math.random() - 0.5) * 0.25,
+          vy: (Math.random() - 0.5) * 0.25 - 0.1,
+          alpha: Math.random() * 0.4 + 0.1,
+          pulse: Math.random() * Math.PI * 2
+        });
+      }
+    }
+
+    function drawParticles() {
+      ctx.clearRect(0, 0, width, height);
+      for (const p of particles) {
+        p.pulse += 0.02;
+        const a = p.alpha + Math.sin(p.pulse) * 0.08;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(142, 203, 166, ${Math.max(0, a)})`;
+        ctx.fill();
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < -10) p.x = width + 10;
+        if (p.x > width + 10) p.x = -10;
+        if (p.y < -10) p.y = height + 10;
+        if (p.y > height + 10) p.y = -10;
+      }
+      requestAnimationFrame(drawParticles);
+    }
+
+    resizeCanvas();
+    createParticles();
+    drawParticles();
+
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      createParticles();
+    });
+  </script>
+</body>
+</html>
