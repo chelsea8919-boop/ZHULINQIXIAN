@@ -142,10 +142,10 @@
     /* Layout */
     .puzzle-layout {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 340px;
+      grid-template-columns: minmax(0, 1fr) 320px;
       gap: 1.25rem;
       padding: 5.5rem 4vw 3rem;
-      max-width: 1500px;
+      max-width: 1560px;
       margin: 0 auto;
       min-height: 100vh;
     }
@@ -154,13 +154,12 @@
       min-width: 0;
     }
 
-    /* Right column: reference on top, tray below */
+    /* Right column: reference on top, progress pinned to bottom */
     .side-column {
       display: flex;
       flex-direction: column;
       gap: 1.25rem;
       min-width: 0;
-      min-height: 0;
     }
 
     /* Reference panel */
@@ -210,12 +209,53 @@
       font-weight: 500;
     }
 
+    /* Progress panel */
+    .progress-panel {
+      margin-top: auto;
+      padding: 0.9rem 1rem;
+      border-radius: 14px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .progress-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.65rem;
+      font-family: "Noto Serif SC", serif;
+      font-size: 0.9rem;
+      color: var(--green-100);
+    }
+
+    .progress-count {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.78rem;
+      color: var(--gold-300);
+    }
+
+    .progress-bar {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--green-500), var(--gold-400));
+      transition: width 0.4s ease;
+    }
+
     /* Board */
     .board-wrap {
       width: 100%;
-      max-width: 980px;
+      max-width: 1080px;
       margin: 0 auto;
-      padding-top: 10px;
     }
 
     .board {
@@ -253,86 +293,21 @@
 
     .target-cell {
       position: absolute;
-      border: 1px dashed rgba(142, 235, 174, 0.25);
       border-radius: 6px;
-      transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+      pointer-events: none;
+      transition: background 0.15s ease, box-shadow 0.15s ease;
     }
 
     .target-cell.active {
-      background: rgba(142, 235, 174, 0.12);
-      border-color: var(--gold-400);
-      box-shadow: 0 0 18px rgba(255, 215, 110, 0.25) inset;
+      z-index: 6;
+      background: rgba(255, 215, 110, 0.16);
+      box-shadow: inset 0 0 0 2px var(--gold-400), inset 0 0 26px rgba(255, 215, 110, 0.22);
     }
 
-    .board .piece {
-      position: absolute;
-      z-index: 2;
-    }
-
-    .board .piece.placed {
-      pointer-events: none;
-      border-color: rgba(142, 235, 174, 0.45);
-      box-shadow: 0 0 0 1px rgba(142, 235, 174, 0.25);
-    }
-
-    /* Tray */
-    .tray-panel {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      min-height: 0;
-      border-radius: 18px;
-      background: var(--glass);
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      overflow: hidden;
-    }
-
-    .tray-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.9rem 1rem;
-      border-bottom: 1px solid var(--glass-border);
-      font-family: "Noto Serif SC", serif;
-      color: var(--green-100);
-      font-size: 0.95rem;
-    }
-
-    .tray-count {
-      font-family: "JetBrains Mono", monospace;
-      font-size: 0.75rem;
-      color: var(--gold-300);
-    }
-
-    .tray {
-      flex: 1;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.8rem;
-      padding: 1rem;
-      overflow-y: auto;
-      align-content: start;
-    }
-
-    .tray .piece {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 320 / 275;
-      border-radius: 8px;
-      cursor: grab;
-      touch-action: none;
-      transition: transform 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
-    }
-
-    .tray .piece:hover {
-      transform: translateY(-3px);
-      filter: brightness(1.08);
-    }
-
-    .tray .piece.drag-source {
-      opacity: 0.25;
+    .target-cell.hover {
+      z-index: 6;
+      background: rgba(142, 235, 174, 0.14);
+      box-shadow: inset 0 0 0 2px rgba(142, 235, 174, 0.55);
     }
 
     /* Pieces */
@@ -344,22 +319,38 @@
       box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
     }
 
-    .drag-layer {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 2000;
+    .board .piece {
+      position: absolute;
+      z-index: 3;
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
     }
 
-    .drag-clone {
-      position: fixed;
-      box-sizing: border-box;
-      background-image: url("assets/hero-combined.png");
-      background-repeat: no-repeat;
-      border: 1px solid rgba(255, 215, 110, 0.45);
-      border-radius: 8px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 24px rgba(255, 215, 110, 0.2);
+    .board .piece:not(.dragging) {
+      transition: left 0.14s ease, top 0.14s ease, box-shadow 0.15s ease;
+    }
+
+    .board .piece.dragging {
+      z-index: 10;
+      cursor: grabbing;
+      border-color: var(--gold-400);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55), 0 0 26px rgba(255, 215, 110, 0.3);
+    }
+
+    .board .piece.placed {
+      z-index: 1;
       pointer-events: none;
+      border-color: rgba(142, 235, 174, 0.45);
+      box-shadow: 0 0 0 1px rgba(142, 235, 174, 0.25);
+      animation: placeFlash 0.5s ease;
+    }
+
+    @keyframes placeFlash {
+      0% { box-shadow: 0 0 0 0 rgba(255, 215, 110, 0.85); }
+      100% { box-shadow: 0 0 0 16px rgba(255, 215, 110, 0); }
     }
 
     /* Gesture UI */
@@ -489,13 +480,14 @@
         grid-template-columns: 1fr;
       }
 
-      .tray-panel {
-        max-height: 320px;
-      }
-
       .reference-panel {
         width: 100%;
-        max-width: 360px;
+        max-width: 380px;
+      }
+
+      .progress-panel {
+        width: 100%;
+        max-width: 380px;
       }
     }
 
@@ -512,10 +504,6 @@
 
       .puzzle-layout {
         padding: 5rem 3vw 2rem;
-      }
-
-      .tray {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
 
       .video-preview {
@@ -552,25 +540,24 @@
       <div class="reference-panel">
         <div class="reference-title">原图参考</div>
         <img src="assets/hero-combined.png" alt="竹林七贤与荣启期拼砖画原图" class="reference-img" />
-        <p class="reference-tip">请参照这张原图，将下方碎片拼成完整的拼砖画。</p>
+        <p class="reference-tip">碎片已打乱铺满拼图框。拖动任意碎片可与其它碎片交换位置，放到正确位置即自动锁定。</p>
         <div class="gesture-guide">
           <strong>操作方式</strong><br />
-          · 鼠标 / 手指：按住碎片拖到正确位置<br />
-          · 手势：食指选中，张开手掌移动，握拳嵌入
+          · 鼠标 / 手指：按住碎片拖到它的正确位置<br />
+          · 手势：食指选中，张开手掌移动，握拳放下
         </div>
       </div>
 
-      <div class="tray-panel">
-        <div class="tray-header">
-          <span>碎片栏</span>
-          <span id="trayCount" class="tray-count">0 / 20</span>
+      <div class="progress-panel">
+        <div class="progress-header">
+          <span>拼图进度</span>
+          <span id="progressCount" class="progress-count">0 / 20</span>
         </div>
-        <div id="tray" class="tray"></div>
+        <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
       </div>
     </aside>
   </main>
 
-  <div id="dragLayer" class="drag-layer"></div>
   <div id="virtualCursor" class="virtual-cursor"></div>
   <div id="gestureStatus" class="gesture-status">手势控制未开启</div>
 
@@ -588,27 +575,307 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
-
   <script>
-    /* ====================== 基础配置 ====================== */
-    const COLS = 5;
-    const ROWS = 4;
-    const TOTAL = COLS * ROWS;
-    const SNAP_PADDING = 28;
+    (function () {
+      'use strict';
 
-    const board = document.getElementById('board');
-    const boardPieces = document.getElementById('boardPieces');
-    const targetCellsEl = document.getElementById('targetCells');
-    const tray = document.getElementById('tray');
-    const trayCount = document.getElementById('trayCount');
-    const dragLayer = document.getElementById('dragLayer');
-    const successOverlay = document.getElementById('successOverlay');
+      /* ====================== 基础配置 ====================== */
+      const COLS = 5;
+      const ROWS = 4;
+      const TOTAL = COLS * ROWS;
+      const EDGE_PADDING = 14;
+
+      const board = document.getElementById('board');
+      const boardPieces = document.getElementById('boardPieces');
+      const targetCellsEl = document.getElementById('targetCells');
+      const progressCount = document.getElementById('progressCount');
+      const progressFill = document.getElementById('progressFill');
+      const successOverlay = document.getElementById('successOverlay');
+      const resetBtn = document.getElementById('resetBtn');
+      const againBtn = document.getElementById('againBtn');
+      const gestureStatus = document.getElementById('gestureStatus');
+
+      let pieces = [];
+      let placedCount = 0;
+      let dragState = { piece: null, pointerId: null };
+
+      /* ====================== 拼图初始化 ====================== */
+      function createPieces() {
+        pieces = [];
+        boardPieces.innerHTML = '';
+        targetCellsEl.innerHTML = '';
+        placedCount = 0;
+
+        // 1. 生成目标格子（仅用于高亮提示，不响应指针）
+        for (let row = 0; row < ROWS; row++) {
+          for (let col = 0; col < COLS; col++) {
+            const cell = document.createElement('div');
+            cell.className = 'target-cell';
+            cell.dataset.col = col;
+            cell.dataset.row = row;
+            cell.style.width = `calc(100% / ${COLS})`;
+            cell.style.height = `calc(100% / ${ROWS})`;
+            cell.style.left = `${(col * 100) / COLS}%`;
+            cell.style.top = `${(row * 100) / ROWS}%`;
+            targetCellsEl.appendChild(cell);
+          }
+        }
+
+        // 2. 生成碎片，直接铺进拼图框内
+        let index = 0;
+        for (let row = 0; row < ROWS; row++) {
+          for (let col = 0; col < COLS; col++) {
+            const el = document.createElement('div');
+            el.className = 'piece';
+            el.dataset.id = `piece-${index}`;
+            el.title = `碎片 ${index + 1}`;
+            el.style.backgroundSize = `${COLS * 100}% ${ROWS * 100}%`;
+            el.style.backgroundPosition = `${(col / (COLS - 1)) * 100}% ${(row / (ROWS - 1)) * 100}%`;
+            el.addEventListener('pointerdown', onPiecePointerDown);
+            boardPieces.appendChild(el);
+            pieces.push({
+              id: `piece-${index}`,
+              col,
+              row,
+              curCol: col,
+              curRow: row,
+              placed: false,
+              element: el
+            });
+            index++;
+          }
+        }
+
+        // 3. 打乱：随机铺位，并保证开局没有任何碎片在正确位置
+        const cells = [];
+        for (let row = 0; row < ROWS; row++) {
+          for (let col = 0; col < COLS; col++) cells.push({ col, row });
+        }
+        let perm;
+        do {
+          perm = shuffle(cells.slice());
+        } while (perm.some((c, i) => c.col === pieces[i].col && c.row === pieces[i].row));
+        pieces.forEach((p, i) => setPieceCell(p, perm[i].col, perm[i].row));
+
+        updateProgress();
+      }
+
+      function shuffle(arr) {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+      }
+
+      function setPieceCell(piece, col, row) {
+        piece.curCol = col;
+        piece.curRow = row;
+        piece.element.style.width = `calc(100% / ${COLS})`;
+        piece.element.style.height = `calc(100% / ${ROWS})`;
+        piece.element.style.left = `${(col * 100) / COLS}%`;
+        piece.element.style.top = `${(row * 100) / ROWS}%`;
+      }
+
+      function findPieceById(id) {
+        return pieces.find(p => p.id === id);
+      }
+
+      function cellEl(col, row) {
+        return targetCellsEl.querySelector(
+          `.target-cell[data-col="${col}"][data-row="${row}"]`
+        );
+      }
+
+      function pieceAt(col, row) {
+        return pieces.find(
+          p => p !== dragState.piece && p.curCol === col && p.curRow === row
+        );
+      }
+
+      function hitCell(x, y) {
+        const r = board.getBoundingClientRect();
+        if (x < r.left - EDGE_PADDING || x > r.right + EDGE_PADDING) return null;
+        if (y < r.top - EDGE_PADDING || y > r.bottom + EDGE_PADDING) return null;
+        const col = Math.max(0, Math.min(COLS - 1, Math.floor((x - r.left) / (r.width / COLS))));
+        const row = Math.max(0, Math.min(ROWS - 1, Math.floor((y - r.top) / (r.height / ROWS))));
+        return { col, row };
+      }
+
+      function clearHover() {
+        targetCellsEl
+          .querySelectorAll('.target-cell.hover')
+          .forEach(el => el.classList.remove('hover'));
+      }
+
+      /* ====================== 鼠标 / 触屏拖拽 ====================== */
+      function onPiecePointerDown(e) {
+        if (e.button !== undefined && e.button !== 0) return;
+        const piece = findPieceById(e.currentTarget.dataset.id);
+        if (!piece || piece.placed) return;
+
+        e.preventDefault();
+        startDrag(piece, e.clientX, e.clientY);
+        dragState.pointerId = e.pointerId;
+
+        window.addEventListener('pointermove', onWindowPointerMove);
+        window.addEventListener('pointerup', onWindowPointerUp);
+        window.addEventListener('pointercancel', onWindowPointerUp);
+      }
+
+      function startDrag(piece, x, y) {
+        if (dragState.piece) return;
+        dragState.piece = piece;
+        piece.element.classList.add('dragging');
+        const target = cellEl(piece.col, piece.row);
+        if (target) target.classList.add('active');
+        moveDrag(x, y);
+      }
+
+      function moveDrag(x, y) {
+        const piece = dragState.piece;
+        if (!piece) return;
+        const r = board.getBoundingClientRect();
+        const cellW = r.width / COLS;
+        const cellH = r.height / ROWS;
+        let left = x - r.left - cellW / 2;
+        let top = y - r.top - cellH / 2;
+        left = Math.max(0, Math.min(r.width - cellW, left));
+        top = Math.max(0, Math.min(r.height - cellH, top));
+        piece.element.style.left = `${left}px`;
+        piece.element.style.top = `${top}px`;
+
+        clearHover();
+        const cell = hitCell(x, y);
+        if (cell && !(cell.col === piece.col && cell.row === piece.row)) {
+          const el = cellEl(cell.col, cell.row);
+          if (el) el.classList.add('hover');
+        }
+      }
+
+      function onWindowPointerMove(e) {
+        if (dragState.piece) moveDrag(e.clientX, e.clientY);
+      }
+
+      function onWindowPointerUp(e) {
+        if (!dragState.piece) return;
+        endDrag(e.clientX, e.clientY);
+        window.removeEventListener('pointermove', onWindowPointerMove);
+        window.removeEventListener('pointerup', onWindowPointerUp);
+        window.removeEventListener('pointercancel', onWindowPointerUp);
+      }
+
+      function endDrag(x, y) {
+        const piece = dragState.piece;
+        if (!piece) return;
+
+        const target = cellEl(piece.col, piece.row);
+        if (target) target.classList.remove('active');
+        clearHover();
+
+        piece.element.classList.remove('dragging');
+        const cell = hitCell(x, y);
+        let moved = false;
+        if (cell) {
+          const occupant = pieceAt(cell.col, cell.row);
+          if (!occupant) {
+            // 空位：直接放入
+            setPieceCell(piece, cell.col, cell.row);
+            moved = true;
+          } else if (!occupant.placed) {
+            // 与该位置的碎片交换
+            const origin = { col: piece.curCol, row: piece.curRow };
+            setPieceCell(piece, cell.col, cell.row);
+            setPieceCell(occupant, origin.col, origin.row);
+            tryLock(occupant);
+            moved = true;
+          }
+          // 若该位置已锁定碎片，则本次拖动无效
+        }
+        if (!moved) setPieceCell(piece, piece.curCol, piece.curRow);
+
+        tryLock(piece);
+        dragState.piece = null;
+        dragState.pointerId = null;
+        updateProgress();
+
+        if (placedCount === TOTAL) {
+          setTimeout(showSuccess, 400);
+        }
+      }
+
+      function tryLock(piece) {
+        if (piece.placed) return;
+        if (piece.curCol !== piece.col || piece.curRow !== piece.row) return;
+        piece.placed = true;
+        placedCount++;
+        piece.element.classList.remove('dragging');
+        piece.element.classList.add('placed');
+      }
+
+      function updateProgress() {
+        progressCount.textContent = `${placedCount} / ${TOTAL}`;
+        progressFill.style.width = `${(placedCount / TOTAL) * 100}%`;
+      }
+
+      function showSuccess() {
+        successOverlay.classList.add('show');
+      }
+
+      function resetGame() {
+        successOverlay.classList.remove('show');
+        createPieces();
+      }
+
+      resetBtn.addEventListener('click', resetGame);
+      againBtn.addEventListener('click', resetGame);
+
+      /* ====================== 供手势模块调用的接口 ====================== */
+      function trySelectPieceAt(x, y) {
+        if (dragState.piece) return;
+        const el = document.elementFromPoint(x, y);
+        if (!el || !el.closest) return;
+        const pieceEl = el.closest('.piece');
+        if (!pieceEl) return;
+        const piece = findPieceById(pieceEl.dataset.id);
+        if (!piece || piece.placed) return;
+        startDrag(piece, x, y);
+      }
+
+      window.PuzzleDrag = {
+        selectAt: trySelectPieceAt,
+        moveAt: function (x, y) {
+          if (dragState.piece) moveDrag(x, y);
+        },
+        dropAt: function (x, y) {
+          if (dragState.piece) endDrag(x, y);
+        },
+        cancel: function () {
+          if (dragState.piece) endDrag(-9999, -9999);
+        }
+      };
+
+      /* ====================== 启动 ====================== */
+      createPieces();
+
+      // 手势模块加载兜底提示（模块脚本从 CDN 动态加载）
+      setTimeout(function () {
+        if (!window.__gestureModuleLoaded) {
+          gestureStatus.textContent = '手势模块加载失败，请检查网络后刷新重试';
+        }
+      }, 8000);
+    })();
+  </script>
+
+  <script type="module">
+    /* ====================== MediaPipe Tasks Vision 手势控制 ====================== */
+    const VISION_BASE = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
+    const MODEL_URL = 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task';
+
+    window.__gestureModuleLoaded = true;
+
     const gestureBtn = document.getElementById('gestureBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const againBtn = document.getElementById('againBtn');
     const gestureStatus = document.getElementById('gestureStatus');
     const videoPreview = document.getElementById('videoPreview');
     const videoLabel = document.getElementById('videoLabel');
@@ -616,454 +883,219 @@
     const overlayCanvas = document.getElementById('overlayCanvas');
     const virtualCursor = document.getElementById('virtualCursor');
 
-    let pieces = [];
-    let placedCount = 0;
-    let dragState = {
-      piece: null,
-      clone: null,
-      offsetX: 0,
-      offsetY: 0,
-      targetCell: null,
-      cellRect: null,
-      pointerId: null
-    };
-
-    /* ====================== 拼图初始化 ====================== */
-    function createPieces() {
-      pieces = [];
-      tray.innerHTML = '';
-      boardPieces.innerHTML = '';
-      targetCellsEl.innerHTML = '';
-      placedCount = 0;
-
-      // 1. 生成目标格子
-      for (let row = 0; row < ROWS; row++) {
-        for (let col = 0; col < COLS; col++) {
-          const cell = document.createElement('div');
-          cell.className = 'target-cell';
-          cell.dataset.col = col;
-          cell.dataset.row = row;
-          cell.style.width = `calc(100% / ${COLS})`;
-          cell.style.height = `calc(100% / ${ROWS})`;
-          cell.style.left = `${(col * 100) / COLS}%`;
-          cell.style.top = `${(row * 100) / ROWS}%`;
-          targetCellsEl.appendChild(cell);
-        }
-      }
-
-      // 2. 生成碎片
-      let index = 0;
-      for (let row = 0; row < ROWS; row++) {
-        for (let col = 0; col < COLS; col++) {
-          const piece = {
-            id: `piece-${index}`,
-            col,
-            row,
-            placed: false,
-            element: null
-          };
-          const el = document.createElement('div');
-          el.className = 'piece';
-          el.dataset.id = piece.id;
-          el.dataset.col = col;
-          el.dataset.row = row;
-          el.title = `碎片 ${index + 1}`;
-          el.style.backgroundSize = `${COLS * 100}% ${ROWS * 100}%`;
-          el.style.backgroundPosition = `${(col / (COLS - 1)) * 100}% ${(row / (ROWS - 1)) * 100}%`;
-          el.addEventListener('pointerdown', onPiecePointerDown);
-          piece.element = el;
-          pieces.push(piece);
-          index++;
-        }
-      }
-
-      // 3. 打乱并放入右侧栏
-      const shuffled = shuffle(pieces.slice());
-      shuffled.forEach(p => tray.appendChild(p.element));
-      updateTrayCount();
-    }
-
-    function shuffle(arr) {
-      const a = arr.slice();
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
-    }
-
-    function updateTrayCount() {
-      trayCount.textContent = `${placedCount} / ${TOTAL}`;
-    }
-
-    function findPieceById(id) {
-      return pieces.find(p => p.id === id);
-    }
-
-    function findTargetCell(piece) {
-      return targetCellsEl.querySelector(
-        `.target-cell[data-col="${piece.col}"][data-row="${piece.row}"]`
-      );
-    }
-
-    /* ====================== 鼠标 / 触屏拖拽 ====================== */
-    function onPiecePointerDown(e) {
-      if (e.button !== undefined && e.button !== 0) return;
-      const piece = findPieceById(e.currentTarget.dataset.id);
-      if (!piece || piece.placed) return;
-
-      e.preventDefault();
-      startDrag(piece, e.clientX, e.clientY);
-      dragState.pointerId = e.pointerId;
-
-      window.addEventListener('pointermove', onWindowPointerMove);
-      window.addEventListener('pointerup', onWindowPointerUp);
-      window.addEventListener('pointercancel', onWindowPointerUp);
-    }
-
-    function startDrag(piece, x, y) {
-      if (dragState.piece) return;
-      const rect = board.getBoundingClientRect();
-      const cellW = rect.width / COLS;
-      const cellH = rect.height / ROWS;
-
-      const clone = document.createElement('div');
-      clone.className = 'drag-clone';
-      clone.style.width = `${cellW * 1.05}px`;
-      clone.style.height = `${cellH * 1.05}px`;
-      clone.style.backgroundSize = `${COLS * 100}% ${ROWS * 100}%`;
-      clone.style.backgroundPosition = `${(piece.col / (COLS - 1)) * 100}% ${(piece.row / (ROWS - 1)) * 100}%`;
-      dragLayer.appendChild(clone);
-
-      dragState.piece = piece;
-      dragState.clone = clone;
-      dragState.offsetX = cellW * 0.525;
-      dragState.offsetY = cellH * 0.525;
-      dragState.targetCell = findTargetCell(piece);
-      dragState.cellRect = dragState.targetCell.getBoundingClientRect();
-
-      piece.element.classList.add('drag-source');
-      moveDrag(x, y);
-    }
-
-    function moveDrag(x, y) {
-      if (!dragState.clone) return;
-      dragState.clone.style.left = `${x - dragState.offsetX}px`;
-      dragState.clone.style.top = `${y - dragState.offsetY}px`;
-
-      const r = dragState.cellRect;
-      const near =
-        x >= r.left - SNAP_PADDING &&
-        x <= r.right + SNAP_PADDING &&
-        y >= r.top - SNAP_PADDING &&
-        y <= r.bottom + SNAP_PADDING;
-
-      if (near) {
-        dragState.targetCell.classList.add('active');
-      } else {
-        dragState.targetCell.classList.remove('active');
-      }
-    }
-
-    function onWindowPointerMove(e) {
-      if (!dragState.piece) return;
-      moveDrag(e.clientX, e.clientY);
-    }
-
-    function onWindowPointerUp(e) {
-      if (!dragState.piece) return;
-      endDrag(e.clientX, e.clientY);
-      window.removeEventListener('pointermove', onWindowPointerMove);
-      window.removeEventListener('pointerup', onWindowPointerUp);
-      window.removeEventListener('pointercancel', onWindowPointerUp);
-    }
-
-    function endDrag(x, y) {
-      const piece = dragState.piece;
-      const r = dragState.cellRect;
-      const near =
-        x >= r.left - SNAP_PADDING &&
-        x <= r.right + SNAP_PADDING &&
-        y >= r.top - SNAP_PADDING &&
-        y <= r.bottom + SNAP_PADDING;
-
-      if (near) {
-        placePiece(piece);
-      } else {
-        piece.element.classList.remove('drag-source');
-      }
-
-      dragState.targetCell.classList.remove('active');
-      dragState.clone.remove();
-      dragState = {
-        piece: null,
-        clone: null,
-        offsetX: 0,
-        offsetY: 0,
-        targetCell: null,
-        cellRect: null,
-        pointerId: null
-      };
-    }
-
-    function placePiece(piece) {
-      piece.placed = true;
-      piece.element.classList.remove('drag-source');
-      piece.element.classList.add('placed');
-      piece.element.style.width = `calc(100% / ${COLS})`;
-      piece.element.style.height = `calc(100% / ${ROWS})`;
-      piece.element.style.left = `${(piece.col * 100) / COLS}%`;
-      piece.element.style.top = `${(piece.row * 100) / ROWS}%`;
-      boardPieces.appendChild(piece.element);
-
-      placedCount++;
-      updateTrayCount();
-
-      if (placedCount === TOTAL) {
-        setTimeout(showSuccess, 350);
-      }
-    }
-
-    function showSuccess() {
-      successOverlay.classList.add('show');
-    }
-
-    function resetGame() {
-      successOverlay.classList.remove('show');
-      createPieces();
-      gestureStatus.textContent = '已重新打乱碎片';
-    }
-
-    resetBtn.addEventListener('click', resetGame);
-    againBtn.addEventListener('click', resetGame);
-
-    /* ====================== 摄像头手势控制 ====================== */
-    let hands = null;
-    let camera = null;
-    let gestureActive = false;
-    let currentGesture = null;
+    let HandLandmarkerRef = null;
+    let DrawingUtilsRef = null;
+    let handLandmarker = null;
+    let stream = null;
+    let running = false;
+    let lastVideoTime = -1;
     let gestureBuffer = [];
 
-    async function toggleGesture() {
-      if (gestureActive) {
+    gestureBtn.addEventListener('click', function () {
+      if (running) {
         stopGesture();
-        return;
+      } else {
+        startGesture();
       }
-      await startGesture();
-    }
+    });
 
     async function startGesture() {
-      if (typeof Hands === 'undefined' || typeof Camera === 'undefined') {
-        gestureStatus.textContent = '手势模块加载失败，请检查网络';
-        return;
-      }
-
+      if (running) return;
       try {
-        gestureActive = true;
         gestureBtn.textContent = '关闭手势控制';
+        gestureStatus.textContent = '正在加载手势模型…';
+
+        if (!handLandmarker) {
+          const vision = await import(`${VISION_BASE}/vision_bundle.mjs`);
+          HandLandmarkerRef = vision.HandLandmarker;
+          DrawingUtilsRef = vision.DrawingUtils;
+
+          const fileset = await vision.FilesetResolver.forVisionTasks(`${VISION_BASE}/wasm`);
+          const create = function (delegate) {
+            return HandLandmarkerRef.createFromOptions(fileset, {
+              baseOptions: {
+                modelAssetPath: MODEL_URL,
+                delegate: delegate
+              },
+              runningMode: 'VIDEO',
+              numHands: 1,
+              minHandDetectionConfidence: 0.6,
+              minTrackingConfidence: 0.6
+            });
+          };
+          try {
+            handLandmarker = await create('GPU');
+          } catch (gpuErr) {
+            console.warn('GPU 推理不可用，回退到 CPU：', gpuErr);
+            handLandmarker = await create('CPU');
+          }
+        }
+
+        gestureStatus.textContent = '正在开启摄像头…';
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: 640, height: 480, facingMode: 'user' },
+          audio: false
+        });
+        inputVideo.srcObject = stream;
+        await inputVideo.play();
+
         videoPreview.classList.add('active');
         virtualCursor.classList.add('active');
-        gestureStatus.textContent = '正在启动摄像头…';
-
-        hands = new Hands({
-          locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
-        });
-        hands.setOptions({
-          maxNumHands: 1,
-          modelComplexity: 0,
-          minDetectionConfidence: 0.6,
-          minTrackingConfidence: 0.5
-        });
-        hands.onResults(onHandsResults);
-
-        camera = new Camera(inputVideo, {
-          onFrame: async () => {
-            if (hands) {
-              await hands.send({ image: inputVideo });
-            }
-          },
-          width: 640,
-          height: 480
-        });
-        await camera.start();
-
+        running = true;
+        lastVideoTime = -1;
         gestureStatus.textContent = '手势控制已开启';
+        requestAnimationFrame(loop);
       } catch (err) {
         console.error(err);
-        gestureActive = false;
+        running = false;
         gestureBtn.textContent = '开启手势控制';
         videoPreview.classList.remove('active');
         virtualCursor.classList.remove('active');
-        gestureStatus.textContent = '无法访问摄像头，请检查权限';
+        if (stream) {
+          stream.getTracks().forEach(function (t) { t.stop(); });
+          stream = null;
+        }
+        inputVideo.srcObject = null;
+        if (err && (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError')) {
+          gestureStatus.textContent = '摄像头权限被拒绝，请在浏览器中允许后重试';
+        } else if (err && err.name === 'NotFoundError') {
+          gestureStatus.textContent = '未检测到摄像头设备';
+        } else {
+          gestureStatus.textContent = '手势开启失败：' + (err && err.message ? err.message : '请检查网络与摄像头');
+        }
       }
     }
 
     function stopGesture() {
-      gestureActive = false;
+      running = false;
       gestureBtn.textContent = '开启手势控制';
       videoPreview.classList.remove('active');
       virtualCursor.classList.remove('active');
       gestureStatus.textContent = '手势控制未开启';
       videoLabel.textContent = '等待手势…';
-
-      if (camera && camera.stop) {
-        camera.stop();
+      if (window.PuzzleDrag) window.PuzzleDrag.cancel();
+      if (stream) {
+        stream.getTracks().forEach(function (t) { t.stop(); });
+        stream = null;
       }
-      if (inputVideo.srcObject) {
-        inputVideo.srcObject.getTracks().forEach(t => t.stop());
-        inputVideo.srcObject = null;
-      }
-      camera = null;
-      hands = null;
-      currentGesture = null;
+      inputVideo.srcObject = null;
       gestureBuffer = [];
+      lastVideoTime = -1;
     }
 
-    gestureBtn.addEventListener('click', toggleGesture);
+    function loop() {
+      if (!running || !handLandmarker) return;
+      if (inputVideo.readyState >= 2 && inputVideo.currentTime !== lastVideoTime) {
+        lastVideoTime = inputVideo.currentTime;
+        try {
+          const results = handLandmarker.detectForVideo(inputVideo, performance.now());
+          handleResults(results);
+        } catch (e) {
+          console.warn(e);
+        }
+      }
+      requestAnimationFrame(loop);
+    }
 
-    function onHandsResults(results) {
-      drawOverlay(results);
+    function handleResults(results) {
+      const w = inputVideo.videoWidth || 640;
+      const h = inputVideo.videoHeight || 480;
+      if (overlayCanvas.width !== w) overlayCanvas.width = w;
+      if (overlayCanvas.height !== h) overlayCanvas.height = h;
+      const ctx = overlayCanvas.getContext('2d');
+      ctx.clearRect(0, 0, w, h);
 
-      if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
-        currentGesture = null;
+      const lms = results && results.landmarks;
+      if (!lms || lms.length === 0) {
         videoLabel.textContent = '未检测到手';
         return;
       }
 
-      const lm = results.multiHandLandmarks[0];
-      const rawGesture = detectGesture(lm);
-      const gesture = smoothGesture(rawGesture);
-      currentGesture = gesture;
+      const lm = lms[0];
 
+      // 绘制手部骨架
+      if (DrawingUtilsRef && HandLandmarkerRef) {
+        const du = new DrawingUtilsRef(ctx);
+        du.drawConnectors(lm, HandLandmarkerRef.HAND_CONNECTIONS, {
+          color: '#8eebae',
+          lineWidth: 2
+        });
+        du.drawLandmarks(lm, { color: '#ffd76e', lineWidth: 1, radius: 3 });
+      }
+
+      const gesture = smoothGesture(detectGesture(lm));
       if (!gesture) {
         videoLabel.textContent = '等待手势…';
         return;
       }
 
-      const cursor = getGestureCursor(lm, gesture);
-      virtualCursor.style.left = `${cursor.x}px`;
-      virtualCursor.style.top = `${cursor.y}px`;
+      // 食指用指尖，其余手势用手掌中心
+      const pt = gesture === 'index' ? lm[8] : lm[9];
+      const x = (1 - pt.x) * window.innerWidth;
+      const y = pt.y * window.innerHeight;
+      virtualCursor.style.left = x + 'px';
+      virtualCursor.style.top = y + 'px';
 
-      if (gesture === 'index') {
-        videoLabel.textContent = '食指：选中碎片';
-        if (!dragState.piece) {
-          trySelectPieceAt(cursor.x, cursor.y);
-        }
-      } else if (gesture === 'palm') {
-        videoLabel.textContent = '手掌：移动碎片';
-        if (dragState.piece) {
-          moveDrag(cursor.x, cursor.y);
-        }
-      } else if (gesture === 'fist') {
-        videoLabel.textContent = '握拳：嵌入碎片';
-        if (dragState.piece) {
-          tryPlaceAtCursor(cursor.x, cursor.y);
+      const api = window.PuzzleDrag;
+      if (api) {
+        if (gesture === 'index') {
+          api.selectAt(x, y);
+        } else if (gesture === 'palm') {
+          api.moveAt(x, y);
+        } else if (gesture === 'fist') {
+          api.dropAt(x, y);
         }
       }
+
+      videoLabel.textContent =
+        gesture === 'index' ? '食指：选中碎片'
+        : gesture === 'palm' ? '手掌：移动碎片'
+        : '握拳：放下碎片';
     }
 
-    function drawOverlay(results) {
-      const ctx = overlayCanvas.getContext('2d');
-      overlayCanvas.width = inputVideo.videoWidth || 640;
-      overlayCanvas.height = inputVideo.videoHeight || 480;
-      ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-
-      if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-        for (const landmarks of results.multiHandLandmarks) {
-          if (typeof drawConnectors === 'function' && typeof HAND_CONNECTIONS !== 'undefined') {
-            drawConnectors(ctx, landmarks, HAND_CONNECTIONS, {
-              color: 'rgba(142, 235, 174, 0.8)',
-              lineWidth: 2
-            });
-            drawLandmarks(ctx, landmarks, {
-              color: 'rgba(255, 215, 110, 0.9)',
-              lineWidth: 1,
-              radius: 3
-            });
-          }
-        }
-      }
-    }
-
+    /* ====================== 手势判定 ====================== */
     function detectGesture(lm) {
-      const index = isFingerExtended(lm, 8, 6);
-      const middle = isFingerExtended(lm, 12, 10);
-      const ring = isFingerExtended(lm, 16, 14);
-      const pinky = isFingerExtended(lm, 20, 18);
+      const index = isFingerExtended(lm, 8, 6, 5);
+      const middle = isFingerExtended(lm, 12, 10, 9);
+      const ring = isFingerExtended(lm, 16, 14, 13);
+      const pinky = isFingerExtended(lm, 20, 18, 17);
 
-      if (index && !middle && !ring && !pinky) return 'index';
-      if (index && middle && ring && pinky) return 'palm';
-      if (!index && !middle && !ring && !pinky) return 'fist';
+      if (index && !middle && !ring && !pinky) return 'index'; // 仅食指伸开：选中
+      if (index && middle && ring && pinky) return 'palm';     // 四指张开：移动
+      if (!index && !middle && !ring && !pinky) return 'fist'; // 握拳：放下
       return null;
     }
 
-    function isFingerExtended(lm, tipIdx, pipIdx) {
+    function isFingerExtended(lm, tipIdx, pipIdx, mcpIdx) {
       const wrist = lm[0];
-      const tipDist = distance(lm[tipIdx], wrist);
-      const pipDist = distance(lm[pipIdx], wrist);
-      return tipDist > pipDist * 1.12;
+      const tip = dist(lm[tipIdx], wrist);
+      const pip = dist(lm[pipIdx], wrist);
+      const mcp = dist(lm[mcpIdx], wrist);
+      return tip > pip * 1.12 && pip >= mcp * 0.95;
     }
 
-    function distance(a, b) {
+    function dist(a, b) {
       return Math.hypot(a.x - b.x, a.y - b.y);
     }
 
-    function smoothGesture(gesture) {
-      gestureBuffer.push(gesture);
-      if (gestureBuffer.length > 5) {
-        gestureBuffer.shift();
-      }
+    // 最近 5 帧多数投票，消除抖动
+    function smoothGesture(g) {
+      gestureBuffer.push(g);
+      if (gestureBuffer.length > 5) gestureBuffer.shift();
       const counts = {};
-      gestureBuffer.forEach(g => {
-        if (g) counts[g] = (counts[g] || 0) + 1;
+      gestureBuffer.forEach(function (x) {
+        if (x) counts[x] = (counts[x] || 0) + 1;
       });
       let best = null;
       let max = 0;
-      for (const key in counts) {
-        if (counts[key] > max) {
-          max = counts[key];
-          best = key;
+      for (const k in counts) {
+        if (counts[k] > max) {
+          max = counts[k];
+          best = k;
         }
       }
-      return best;
+      return max >= 3 ? best : null;
     }
-
-    function getGestureCursor(lm, gesture) {
-      const point = gesture === 'index' ? lm[8] : lm[9];
-      return {
-        x: (1 - point.x) * window.innerWidth,
-        y: point.y * window.innerHeight
-      };
-    }
-
-    function trySelectPieceAt(x, y) {
-      const el = document.elementFromPoint(x, y);
-      if (!el) return;
-      const pieceEl = el.closest('.piece');
-      if (!pieceEl) return;
-      const piece = findPieceById(pieceEl.dataset.id);
-      if (!piece || piece.placed) return;
-      startDrag(piece, x, y);
-    }
-
-    function tryPlaceAtCursor(x, y) {
-      if (!dragState.piece || !dragState.cellRect) return;
-      const r = dragState.cellRect;
-      const near =
-        x >= r.left - SNAP_PADDING &&
-        x <= r.right + SNAP_PADDING &&
-        y >= r.top - SNAP_PADDING &&
-        y <= r.bottom + SNAP_PADDING;
-
-      if (near) {
-        endDrag(x, y);
-      } else {
-        gestureStatus.textContent = '请将碎片移到正确位置后握拳';
-      }
-    }
-
-    /* ====================== 启动 ====================== */
-    createPieces();
   </script>
 </body>
 </html>
