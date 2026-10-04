@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>竹林七贤与荣启期 · 拼图游戏</title>
+  <meta name="description" content="竹林七贤与荣启期错版拼砖画拼图游戏，支持鼠标、手指与摄像头手势三种操作方式" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --green-950: #05311a;
+      --green-900: #074525;
+      --green-800: #0b5a30;
+      --green-700: #10753d;
+      --green-600: #169148;
+      --green-500: #2fb46a;
+      --green-400: #4fd088;
+      --green-300: #8eebae;
+      --green-200: #c5f5d2;
+      --green-100: #e3f8e8;
+      --gold-700: #b8860b;
+      --gold-500: #f2c14e;
+      --gold-400: #ffd76e;
+      --gold-300: #ffe9a6;
+      --text: #f2fdf5;
+      --muted: #b0cbb8;
+      --glass: rgba(255, 255, 255, 0.06);
+      --glass-border: rgba(255, 255, 255, 0.12);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(47, 180, 106, 0.18), transparent 45%),
+        radial-gradient(circle at 80% 80%, rgba(242, 193, 78, 0.10), transparent 50%),
+        var(--green-950);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Nav */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.9rem 4vw;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background: linear-gradient(180deg, rgba(7, 69, 37, 0.9), rgba(7, 69, 37, 0.4));
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      min-width: 0;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      border: 1px solid var(--glass-border);
+      color: var(--green-200);
+      text-decoration: none;
+      font-size: 0.85rem;
+      background: var(--glass);
+      transition: background 0.2s ease, color 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .back-link:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--green-100);
+    }
+
+    .page-title {
+      font-family: "Noto Serif SC", "Source Han Serif SC", serif;
+      font-size: clamp(1rem, 2.4vw, 1.35rem);
+      font-weight: 600;
+      color: var(--green-100);
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .action-btn {
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      border: 1px solid var(--gold-500);
+      background: rgba(242, 193, 78, 0.12);
+      color: var(--green-100);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .action-btn:hover {
+      background: rgba(242, 193, 78, 0.26);
+      transform: translateY(-1px);
+    }
+
+    .action-btn.secondary {
+      border-color: var(--green-500);
+      background: rgba(47, 180, 106, 0.12);
+    }
+
+    .action-btn.secondary:hover {
+      background: rgba(47, 180, 106, 0.26);
+    }
+
+    /* Layout */
+    .puzzle-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 1.25rem;
+      padding: 5.5rem 4vw 3rem;
+      max-width: 1500px;
+      margin: 0 auto;
+      min-height: 100vh;
+    }
+
+    .board-area {
+      position: relative;
+      min-width: 0;
+    }
+
+    /* Reference panel */
+    .reference-panel {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 230px;
+      padding: 0.9rem;
+      border-radius: 14px;
+      background: var(--glass);
+      border: 1px solid rgba(242, 193, 78, 0.22);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 5;
+    }
+
+    .reference-title {
+      font-family: "Noto Serif SC", serif;
+      font-size: 0.95rem;
+      color: var(--gold-300);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.05em;
+    }
+
+    .reference-img {
+      width: 100%;
+      border-radius: 8px;
+      display: block;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .reference-tip {
+      margin-top: 0.6rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .gesture-guide {
+      margin-top: 0.7rem;
+      padding-top: 0.6rem;
+      border-top: 1px dashed rgba(255, 255, 255, 0.15);
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .gesture-guide strong {
+      color: var(--green-200);
+      font-weight: 500;
+    }
+
+    /* Board */
+    .board-wrap {
+      width: 100%;
+      max-width: 980px;
+      margin: 0 auto;
+      padding-top: 10px;
+    }
+
+    .board {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1600 / 1100;
+      border-radius: 18px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--glass-border);
+      box-shadow:
+        0 30px 90px rgba(0, 0, 0, 0.45),
+        inset 0 0 80px rgba(2, 20, 10, 0.5);
+    }
+
+    .board-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url("assets/hero-combined.png");
+      background-size: cover;
+      background-position: center;
+      opacity: 0.08;
+      pointer-events: none;
+    }
+
+    .board-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(142, 235, 174, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(142, 235, 174, 0.06) 1px, transparent 1px);
+      background-size: calc(100% / 5) calc(100% / 4);
+      pointer-events: none;
+    }
+
+    .target-cell {
+      position: absolute;
+      border: 1px dashed rgba(142, 235, 174, 0.25);
+      border-radius: 6px;
+      transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .target-cell.active {
+      background: rgba(142, 235, 174, 0.12);
+      border-color: var(--gold-400);
+      box-shadow: 0 0 18px rgba(255, 215, 110, 0.25) inset;
+    }
+
+    .board .piece {
+      position: absolute;
+      z-index: 2;
+    }
+
+    .board .piece.placed {
+      pointer-events: none;
+      border-color: rgba(142, 235, 174, 0.45);
+      box-shadow: 0 0 0 1px rgba(142, 235, 174, 0.25);
+    }
+
+    /* Tray */
+    .tray-panel {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      border-radius: 18px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      overflow: hidden;
+    }
+
+    .tray-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.9rem 1rem;
+      border-bottom: 1px solid var(--glass-border);
+      font-family: "Noto Serif SC", serif;
+      color: var(--green-100);
+      font-size: 0.95rem;
+    }
+
+    .tray-count {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.75rem;
+      color: var(--gold-300);
+    }
+
+    .tray {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.8rem;
+      padding: 1rem;
+      overflow-y: auto;
+      align-content: start;
+    }
+
+    .tray .piece {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 320 / 275;
+      border-radius: 8px;
+      cursor: grab;
+      touch-action: none;
+      transition: transform 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
+    }
+
+    .tray .piece:hover {
+      transform: translateY(-3px);
+      filter: brightness(1.08);
+    }
+
+    .tray .piece.drag-source {
+      opacity: 0.25;
+    }
+
+    /* Pieces */
+    .piece {
+      box-sizing: border-box;
+      background-image: url("assets/hero-combined.png");
+      background-repeat: no-repeat;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+    }
+
+    .drag-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2000;
+    }
+
+    .drag-clone {
+      position: fixed;
+      box-sizing: border-box;
+      background-image: url("assets/hero-combined.png");
+      background-repeat: no-repeat;
+      border: 1px solid rgba(255, 215, 110, 0.45);
+      border-radius: 8px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 24px rgba(255, 215, 110, 0.2);
+      pointer-events: none;
+    }
+
+    /* Gesture UI */
+    .video-preview {
+      position: fixed;
+      right: 1rem;
+      bottom: 1rem;
+      width: 220px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--glass-border);
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1500;
+      display: none;
+    }
+
+    .video-preview.active {
+      display: block;
+    }
+
+    .video-preview video,
+    .video-preview canvas {
+      display: block;
+      width: 100%;
+      transform: scaleX(-1);
+    }
+
+    .video-preview canvas {
+      position: absolute;
+      inset: 0;
+      height: 100%;
+    }
+
+    .video-label {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 0.35rem 0.5rem;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.7rem;
+      color: var(--green-200);
+      background: rgba(2, 15, 9, 0.7);
+      text-align: center;
+      letter-spacing: 0.05em;
+    }
+
+    .virtual-cursor {
+      position: fixed;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid var(--gold-400);
+      background: rgba(255, 215, 110, 0.12);
+      box-shadow: 0 0 18px rgba(255, 215, 110, 0.35);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 2200;
+      display: none;
+    }
+
+    .virtual-cursor.active {
+      display: block;
+    }
+
+    .gesture-status {
+      position: fixed;
+      left: 50%;
+      bottom: 1rem;
+      transform: translateX(-50%);
+      padding: 0.45rem 1rem;
+      border-radius: 999px;
+      background: rgba(2, 15, 9, 0.75);
+      border: 1px solid var(--glass-border);
+      color: var(--green-200);
+      font-size: 0.78rem;
+      z-index: 1600;
+      pointer-events: none;
+    }
+
+    /* Success */
+    .success-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(2, 15, 9, 0.75);
+      backdrop-filter: blur(10px);
+      z-index: 3000;
+    }
+
+    .success-overlay.show {
+      display: flex;
+    }
+
+    .success-card {
+      text-align: center;
+      padding: 3rem 3.5rem;
+      border-radius: 22px;
+      background: rgba(7, 69, 37, 0.85);
+      border: 1px solid rgba(242, 193, 78, 0.35);
+      box-shadow: 0 30px 100px rgba(0, 0, 0, 0.6);
+      animation: successPop 0.5s ease;
+    }
+
+    @keyframes successPop {
+      0% { transform: scale(0.85); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .success-title {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      color: var(--gold-300);
+      margin-bottom: 0.75rem;
+    }
+
+    .success-text {
+      color: var(--muted);
+      margin-bottom: 1.75rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .puzzle-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .tray-panel {
+        max-height: 320px;
+      }
+
+      .reference-panel {
+        position: static;
+        width: 100%;
+        max-width: 320px;
+        margin-bottom: 1rem;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .nav {
+        flex-wrap: wrap;
+        padding: 0.7rem 3vw;
+      }
+
+      .nav-actions {
+        width: 100%;
+        justify-content: flex-end;
+      }
+
+      .puzzle-layout {
+        padding: 5rem 3vw 2rem;
+      }
+
+      .tray {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .video-preview {
+        width: 150px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-left">
+      <a href="index.html" class="back-link">← 返回首页</a>
+      <div class="page-title">竹林七贤与荣启期 · 拼图游戏</div>
+    </div>
+    <div class="nav-actions">
+      <button id="gestureBtn" class="action-btn" type="button">开启手势控制</button>
+      <button id="resetBtn" class="action-btn secondary" type="button">重新打乱</button>
+    </div>
+  </nav>
+
+  <main class="puzzle-layout">
+    <section class="board-area">
+      <div class="reference-panel">
+        <div class="reference-title">原图参考</div>
+        <img src="assets/hero-combined.png" alt="竹林七贤与荣启期拼砖画原图" class="reference-img" />
+        <p class="reference-tip">请把右侧碎片拼成左上角这张完整的拼砖画。</p>
+        <div class="gesture-guide">
+          <strong>操作方式</strong><br />
+          · 鼠标 / 手指：按住碎片拖到正确位置<br />
+          · 手势：食指选中，张开手掌移动，握拳嵌入
+        </div>
+      </div>
+
+      <div class="board-wrap">
+        <div id="board" class="board">
+          <div class="board-bg"></div>
+          <div class="board-grid"></div>
+          <div id="targetCells"></div>
+          <div id="boardPieces"></div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="tray-panel">
+      <div class="tray-header">
+        <span>碎片栏</span>
+        <span id="trayCount" class="tray-count">0 / 20</span>
+      </div>
+      <div id="tray" class="tray"></div>
+    </aside>
+  </main>
+
+  <div id="dragLayer" class="drag-layer"></div>
+  <div id="virtualCursor" class="virtual-cursor"></div>
+  <div id="gestureStatus" class="gesture-status">手势控制未开启</div>
+
+  <div id="videoPreview" class="video-preview">
+    <video id="inputVideo" autoplay muted playsinline></video>
+    <canvas id="overlayCanvas"></canvas>
+    <div id="videoLabel" class="video-label">等待手势…</div>
+  </div>
+
+  <div id="successOverlay" class="success-overlay">
+    <div class="success-card">
+      <h2 class="success-title">拼图成功</h2>
+      <p class="success-text">你已完整复原《竹林七贤与荣启期》错版拼砖画。</p>
+      <button id="againBtn" class="action-btn" type="button">再玩一次</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+  <script>
+    /* ====================== 基础配置 ====================== */
+    const COLS = 5;
+    const ROWS = 4;
+    const TOTAL = COLS * ROWS;
+    const SNAP_PADDING = 28;
+
+    const board = document.getElementById('board');
+    const boardPieces = document.getElementById('boardPieces');
+    const targetCellsEl = document.getElementById('targetCells');
+    const tray = document.getElementById('tray');
+    const trayCount = document.getElementById('trayCount');
+    const dragLayer = document.getElementById('dragLayer');
+    const successOverlay = document.getElementById('successOverlay');
+    const gestureBtn = document.getElementById('gestureBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const againBtn = document.getElementById('againBtn');
+    const gestureStatus = document.getElementById('gestureStatus');
+    const videoPreview = document.getElementById('videoPreview');
+    const videoLabel = document.getElementById('videoLabel');
+    const inputVideo = document.getElementById('inputVideo');
+    const overlayCanvas = document.getElementById('overlayCanvas');
+    const virtualCursor = document.getElementById('virtualCursor');
+
+    let pieces = [];
+    let placedCount = 0;
+    let dragState = {
+      piece: null,
+      clone: null,
+      offsetX: 0,
+      offsetY: 0,
+      targetCell: null,
+      cellRect: null,
+      pointerId: null
+    };
+
+    /* ====================== 拼图初始化 ====================== */
+    function createPieces() {
+      pieces = [];
+      tray.innerHTML = '';
+      boardPieces.innerHTML = '';
+      targetCellsEl.innerHTML = '';
+      placedCount = 0;
+
+      // 1. 生成目标格子
+      for (let row = 0; row < ROWS; row++) {
+        for (let col = 0; col < COLS; col++) {
+          const cell = document.createElement('div');
+          cell.className = 'target-cell';
+          cell.dataset.col = col;
+          cell.dataset.row = row;
+          cell.style.width = `calc(100% / ${COLS})`;
+          cell.style.height = `calc(100% / ${ROWS})`;
+          cell.style.left = `${(col * 100) / COLS}%`;
+          cell.style.top = `${(row * 100) / ROWS}%`;
+          targetCellsEl.appendChild(cell);
+        }
+      }
+
+      // 2. 生成碎片
+      let index = 0;
+      for (let row = 0; row < ROWS; row++) {
+        for (let col = 0; col < COLS; col++) {
+          const piece = {
+            id: `piece-${index}`,
+            col,
+            row,
+            placed: false,
+            element: null
+          };
+          const el = document.createElement('div');
+          el.className = 'piece';
+          el.dataset.id = piece.id;
+          el.dataset.col = col;
+          el.dataset.row = row;
+          el.title = `碎片 ${index + 1}`;
+          el.style.backgroundSize = `${COLS * 100}% ${ROWS * 100}%`;
+          el.style.backgroundPosition = `${(col / (COLS - 1)) * 100}% ${(row / (ROWS - 1)) * 100}%`;
+          el.addEventListener('pointerdown', onPiecePointerDown);
+          piece.element = el;
+          pieces.push(piece);
+          index++;
+        }
+      }
+
+      // 3. 打乱并放入右侧栏
+      const shuffled = shuffle(pieces.slice());
+      shuffled.forEach(p => tray.appendChild(p.element));
+      updateTrayCount();
+    }
+
+    function shuffle(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function updateTrayCount() {
+      trayCount.textContent = `${placedCount} / ${TOTAL}`;
+    }
+
+    function findPieceById(id) {
+      return pieces.find(p => p.id === id);
+    }
+
+    function findTargetCell(piece) {
+      return targetCellsEl.querySelector(
+        `.target-cell[data-col="${piece.col}"][data-row="${piece.row}"]`
+      );
+    }
+
+    /* ====================== 鼠标 / 触屏拖拽 ====================== */
+    function onPiecePointerDown(e) {
+      if (e.button !== undefined && e.button !== 0) return;
+      const piece = findPieceById(e.currentTarget.dataset.id);
+      if (!piece || piece.placed) return;
+
+      e.preventDefault();
+      startDrag(piece, e.clientX, e.clientY);
+      dragState.pointerId = e.pointerId;
+
+      window.addEventListener('pointermove', onWindowPointerMove);
+      window.addEventListener('pointerup', onWindowPointerUp);
+      window.addEventListener('pointercancel', onWindowPointerUp);
+    }
+
+    function startDrag(piece, x, y) {
+      if (dragState.piece) return;
+      const rect = board.getBoundingClientRect();
+      const cellW = rect.width / COLS;
+      const cellH = rect.height / ROWS;
+
+      const clone = document.createElement('div');
+      clone.className = 'drag-clone';
+      clone.style.width = `${cellW * 1.05}px`;
+      clone.style.height = `${cellH * 1.05}px`;
+      clone.style.backgroundSize = `${COLS * 100}% ${ROWS * 100}%`;
+      clone.style.backgroundPosition = `${(piece.col / (COLS - 1)) * 100}% ${(piece.row / (ROWS - 1)) * 100}%`;
+      dragLayer.appendChild(clone);
+
+      dragState.piece = piece;
+      dragState.clone = clone;
+      dragState.offsetX = cellW * 0.525;
+      dragState.offsetY = cellH * 0.525;
+      dragState.targetCell = findTargetCell(piece);
+      dragState.cellRect = dragState.targetCell.getBoundingClientRect();
+
+      piece.element.classList.add('drag-source');
+      moveDrag(x, y);
+    }
+
+    function moveDrag(x, y) {
+      if (!dragState.clone) return;
+      dragState.clone.style.left = `${x - dragState.offsetX}px`;
+      dragState.clone.style.top = `${y - dragState.offsetY}px`;
+
+      const r = dragState.cellRect;
+      const near =
+        x >= r.left - SNAP_PADDING &&
+        x <= r.right + SNAP_PADDING &&
+        y >= r.top - SNAP_PADDING &&
+        y <= r.bottom + SNAP_PADDING;
+
+      if (near) {
+        dragState.targetCell.classList.add('active');
+      } else {
+        dragState.targetCell.classList.remove('active');
+      }
+    }
+
+    function onWindowPointerMove(e) {
+      if (!dragState.piece) return;
+      moveDrag(e.clientX, e.clientY);
+    }
+
+    function onWindowPointerUp(e) {
+      if (!dragState.piece) return;
+      endDrag(e.clientX, e.clientY);
+      window.removeEventListener('pointermove', onWindowPointerMove);
+      window.removeEventListener('pointerup', onWindowPointerUp);
+      window.removeEventListener('pointercancel', onWindowPointerUp);
+    }
+
+    function endDrag(x, y) {
+      const piece = dragState.piece;
+      const r = dragState.cellRect;
+      const near =
+        x >= r.left - SNAP_PADDING &&
+        x <= r.right + SNAP_PADDING &&
+        y >= r.top - SNAP_PADDING &&
+        y <= r.bottom + SNAP_PADDING;
+
+      if (near) {
+        placePiece(piece);
+      } else {
+        piece.element.classList.remove('drag-source');
+      }
+
+      dragState.targetCell.classList.remove('active');
+      dragState.clone.remove();
+      dragState = {
+        piece: null,
+        clone: null,
+        offsetX: 0,
+        offsetY: 0,
+        targetCell: null,
+        cellRect: null,
+        pointerId: null
+      };
+    }
+
+    function placePiece(piece) {
+      piece.placed = true;
+      piece.element.classList.remove('drag-source');
+      piece.element.classList.add('placed');
+      piece.element.style.width = `calc(100% / ${COLS})`;
+      piece.element.style.height = `calc(100% / ${ROWS})`;
+      piece.element.style.left = `${(piece.col * 100) / COLS}%`;
+      piece.element.style.top = `${(piece.row * 100) / ROWS}%`;
+      boardPieces.appendChild(piece.element);
+
+      placedCount++;
+      updateTrayCount();
+
+      if (placedCount === TOTAL) {
+        setTimeout(showSuccess, 350);
+      }
+    }
+
+    function showSuccess() {
+      successOverlay.classList.add('show');
+    }
+
+    function resetGame() {
+      successOverlay.classList.remove('show');
+      createPieces();
+      gestureStatus.textContent = '已重新打乱碎片';
+    }
+
+    resetBtn.addEventListener('click', resetGame);
+    againBtn.addEventListener('click', resetGame);
+
+    /* ====================== 摄像头手势控制 ====================== */
+    let hands = null;
+    let camera = null;
+    let gestureActive = false;
+    let currentGesture = null;
+    let gestureBuffer = [];
+
+    async function toggleGesture() {
+      if (gestureActive) {
+        stopGesture();
+        return;
+      }
+      await startGesture();
+    }
+
+    async function startGesture() {
+      if (typeof Hands === 'undefined' || typeof Camera === 'undefined') {
+        gestureStatus.textContent = '手势模块加载失败，请检查网络';
+        return;
+      }
+
+      try {
+        gestureActive = true;
+        gestureBtn.textContent = '关闭手势控制';
+        videoPreview.classList.add('active');
+        virtualCursor.classList.add('active');
+        gestureStatus.textContent = '正在启动摄像头…';
+
+        hands = new Hands({
+          locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+        });
+        hands.setOptions({
+          maxNumHands: 1,
+          modelComplexity: 0,
+          minDetectionConfidence: 0.6,
+          minTrackingConfidence: 0.5
+        });
+        hands.onResults(onHandsResults);
+
+        camera = new Camera(inputVideo, {
+          onFrame: async () => {
+            if (hands) {
+              await hands.send({ image: inputVideo });
+            }
+          },
+          width: 640,
+          height: 480
+        });
+        await camera.start();
+
+        gestureStatus.textContent = '手势控制已开启';
+      } catch (err) {
+        console.error(err);
+        gestureActive = false;
+        gestureBtn.textContent = '开启手势控制';
+        videoPreview.classList.remove('active');
+        virtualCursor.classList.remove('active');
+        gestureStatus.textContent = '无法访问摄像头，请检查权限';
+      }
+    }
+
+    function stopGesture() {
+      gestureActive = false;
+      gestureBtn.textContent = '开启手势控制';
+      videoPreview.classList.remove('active');
+      virtualCursor.classList.remove('active');
+      gestureStatus.textContent = '手势控制未开启';
+      videoLabel.textContent = '等待手势…';
+
+      if (camera && camera.stop) {
+        camera.stop();
+      }
+      if (inputVideo.srcObject) {
+        inputVideo.srcObject.getTracks().forEach(t => t.stop());
+        inputVideo.srcObject = null;
+      }
+      camera = null;
+      hands = null;
+      currentGesture = null;
+      gestureBuffer = [];
+    }
+
+    gestureBtn.addEventListener('click', toggleGesture);
+
+    function onHandsResults(results) {
+      drawOverlay(results);
+
+      if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
+        currentGesture = null;
+        videoLabel.textContent = '未检测到手';
+        return;
+      }
+
+      const lm = results.multiHandLandmarks[0];
+      const rawGesture = detectGesture(lm);
+      const gesture = smoothGesture(rawGesture);
+      currentGesture = gesture;
+
+      if (!gesture) {
+        videoLabel.textContent = '等待手势…';
+        return;
+      }
+
+      const cursor = getGestureCursor(lm, gesture);
+      virtualCursor.style.left = `${cursor.x}px`;
+      virtualCursor.style.top = `${cursor.y}px`;
+
+      if (gesture === 'index') {
+        videoLabel.textContent = '食指：选中碎片';
+        if (!dragState.piece) {
+          trySelectPieceAt(cursor.x, cursor.y);
+        }
+      } else if (gesture === 'palm') {
+        videoLabel.textContent = '手掌：移动碎片';
+        if (dragState.piece) {
+          moveDrag(cursor.x, cursor.y);
+        }
+      } else if (gesture === 'fist') {
+        videoLabel.textContent = '握拳：嵌入碎片';
+        if (dragState.piece) {
+          tryPlaceAtCursor(cursor.x, cursor.y);
+        }
+      }
+    }
+
+    function drawOverlay(results) {
+      const ctx = overlayCanvas.getContext('2d');
+      overlayCanvas.width = inputVideo.videoWidth || 640;
+      overlayCanvas.height = inputVideo.videoHeight || 480;
+      ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+
+      if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+        for (const landmarks of results.multiHandLandmarks) {
+          if (typeof drawConnectors === 'function' && typeof HAND_CONNECTIONS !== 'undefined') {
+            drawConnectors(ctx, landmarks, HAND_CONNECTIONS, {
+              color: 'rgba(142, 235, 174, 0.8)',
+              lineWidth: 2
+            });
+            drawLandmarks(ctx, landmarks, {
+              color: 'rgba(255, 215, 110, 0.9)',
+              lineWidth: 1,
+              radius: 3
+            });
+          }
+        }
+      }
+    }
+
+    function detectGesture(lm) {
+      const index = isFingerExtended(lm, 8, 6);
+      const middle = isFingerExtended(lm, 12, 10);
+      const ring = isFingerExtended(lm, 16, 14);
+      const pinky = isFingerExtended(lm, 20, 18);
+
+      if (index && !middle && !ring && !pinky) return 'index';
+      if (index && middle && ring && pinky) return 'palm';
+      if (!index && !middle && !ring && !pinky) return 'fist';
+      return null;
+    }
+
+    function isFingerExtended(lm, tipIdx, pipIdx) {
+      const wrist = lm[0];
+      const tipDist = distance(lm[tipIdx], wrist);
+      const pipDist = distance(lm[pipIdx], wrist);
+      return tipDist > pipDist * 1.12;
+    }
+
+    function distance(a, b) {
+      return Math.hypot(a.x - b.x, a.y - b.y);
+    }
+
+    function smoothGesture(gesture) {
+      gestureBuffer.push(gesture);
+      if (gestureBuffer.length > 5) {
+        gestureBuffer.shift();
+      }
+      const counts = {};
+      gestureBuffer.forEach(g => {
+        if (g) counts[g] = (counts[g] || 0) + 1;
+      });
+      let best = null;
+      let max = 0;
+      for (const key in counts) {
+        if (counts[key] > max) {
+          max = counts[key];
+          best = key;
+        }
+      }
+      return best;
+    }
+
+    function getGestureCursor(lm, gesture) {
+      const point = gesture === 'index' ? lm[8] : lm[9];
+      return {
+        x: (1 - point.x) * window.innerWidth,
+        y: point.y * window.innerHeight
+      };
+    }
+
+    function trySelectPieceAt(x, y) {
+      const el = document.elementFromPoint(x, y);
+      if (!el) return;
+      const pieceEl = el.closest('.piece');
+      if (!pieceEl) return;
+      const piece = findPieceById(pieceEl.dataset.id);
+      if (!piece || piece.placed) return;
+      startDrag(piece, x, y);
+    }
+
+    function tryPlaceAtCursor(x, y) {
+      if (!dragState.piece || !dragState.cellRect) return;
+      const r = dragState.cellRect;
+      const near =
+        x >= r.left - SNAP_PADDING &&
+        x <= r.right + SNAP_PADDING &&
+        y >= r.top - SNAP_PADDING &&
+        y <= r.bottom + SNAP_PADDING;
+
+      if (near) {
+        endDrag(x, y);
+      } else {
+        gestureStatus.textContent = '请将碎片移到正确位置后握拳';
+      }
+    }
+
+    /* ====================== 启动 ====================== */
+    createPieces();
+  </script>
+</body>
+</html>
