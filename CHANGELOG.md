@@ -1,5 +1,13 @@
 # 变更日志
 
+## v5.1 - 2026-10-10 15:50
+- 修复"摄像头无法开启"的根本原因——本地手势模型文件损坏：
+  - 用无头 Chrome（`--use-fake-device-for-media-stream`）实测整条链路，定位到 `createFromOptions` 阶段报 `Unable to open zip archive`
+  - 根因：`assets/hand_landmarker.task` 头部多了 2 个空字节、且缺 zip 结束符（EOCD），MediaPipe 严格 zip 解析器拒绝加载 → 模型初始化失败 → 整条摄像头链路降级到鼠标模式
+  - 修复：解包出两个 tflite（hand_detector / hand_landmarks_detector）后用 Python zipfile 重新打包成干净的 `.task`（PK 开头 + EOCD 完整 + 2 条目），无头测试 `step3 OK via GPU` 通过
+- `puzzle.html` 将"模型初始化"与"开启摄像头"拆成两个独立阶段，各自 try/catch，避免模型报错被误报为"摄像头失败"；模型损坏时给出可操作的重下载指引
+- 变更文件：`assets/hand_landmarker.task`（重打包）、`puzzle.html`
+
 ## v5.0 - 2026-10-10 15:00
 - 首页"七贤名录"新增人物画像：
   - 用文生图生成 8 幅风格统一的工笔重彩画像（深绿衣·金边·松竹背景），存放于 `assets/portraits/`

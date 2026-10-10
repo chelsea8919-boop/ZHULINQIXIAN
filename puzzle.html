@@ -1032,12 +1032,12 @@
         return;
       }
 
-      try {
-        gestureBtn.textContent = '加载手势模型…';
-        gestureBtn.disabled = true;
-        gestureStatus.textContent = '正在检查运行环境…';
+      gestureBtn.textContent = '加载手势模型…';
+      gestureBtn.disabled = true;
+      gestureStatus.textContent = '正在加载本地手势模型…';
 
-        gestureStatus.textContent = '正在加载本地手势模型…';
+      // 阶段一：初始化手势模型（与摄像头无关）。失败单独诊断，避免被误报为"摄像头失败"
+      try {
         if (!handLandmarker) {
           const vision = await loadVisionModule();
           HandLandmarkerRef = vision.HandLandmarker;
@@ -1069,7 +1069,23 @@
           handLandmarker = created;
           window.__gestureModelStatus = 'ok';
         }
+      } catch (modelErr) {
+        console.error('手势模型初始化失败：', modelErr);
+        window.__gestureModelStatus = 'error';
+        gestureBtn.textContent = '开启手势控制';
+        gestureBtn.disabled = false;
+        // 模型坏了 → 摄像头也跑不了，先兜底到鼠标手势并给出可操作的修复指引
+        startMouseGestureMode('手势模型初始化失败');
+        const m = (modelErr && modelErr.message) || '';
+        gestureStatus.textContent =
+          /zip|archive|model|\.task/i.test(m)
+            ? '手势模型文件损坏或加载失败，摄像头手势暂不可用（已切鼠标手势）。请重新下载 hand_landmarker.task 后刷新页面。'
+            : '手势模型初始化失败（' + m + '），已切到鼠标手势。';
+        return;
+      }
 
+      // 阶段二：开启摄像头
+      try {
         gestureStatus.textContent = '正在开启摄像头…';
         stream = await navigator.mediaDevices.getUserMedia({
           video: { width: 640, height: 480, facingMode: 'user' },
@@ -1106,7 +1122,7 @@
           startMouseGestureMode('内置预览未授予摄像头权限');
           gestureStatus.textContent =
             '内置预览的 iframe 未授予摄像头权限，无法开启摄像头手势。已切换到鼠标手势（按下=选中 · 拖动=移动 · 松开=嵌入）。'
-            + ' 如需真实摄像头识别，请点击导航栏"在浏览器中打开"后允许摄像头。';
+            + ' 如需真实摄像头识别，请点击导航栏"📷 在浏览器中打开"后允许摄像头。';
           videoLabel.textContent = 'iframe 无摄像头权限';
         } else if (reason === 'denied') {
           startMouseGestureMode('摄像头权限被拒');
