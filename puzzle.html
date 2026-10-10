@@ -592,7 +592,8 @@
         <div class="gesture-guide">
           <strong>操作方式</strong><br />
           · 鼠标 / 手指：按住碎片拖到它的正确位置<br />
-          · 手势：食指选中，张开手掌移动，握拳放下
+          · 手势：食指选中，张开手掌移动，握拳放下<br />
+          <em style="opacity:.8">预览环境无摄像头时：点击"开启手势控制"自动进入鼠标手势模式（按下=选中 · 拖动=移动 · 松开=嵌入）。</em>
         </div>
       </div>
 
@@ -943,6 +944,8 @@
     let running = false;
     let lastVideoTime = -1;
     let gestureBuffer = [];
+    // 'camera' | 'mouse' | null —— 手势通道
+    let gestureMode = null;
 
     gestureBtn.addEventListener('click', function () {
       if (running) {
@@ -958,20 +961,46 @@
       return visionModule;
     }
 
+    /* ---- 鼠标手势回退通道：摄像头不可用时（file://、嵌入预览等）自动启用 ---- */
+    function startMouseGestureMode(reason) {
+      gestureMode = 'mouse';
+      running = true;
+      virtualCursor.classList.add('active');
+      gestureBtn.textContent = '关闭手势控制';
+      gestureBtn.disabled = false;
+      const msg = reason
+        ? '鼠标手势模式已激活（' + reason + '）。操作：按下=食指选中 · 拖动=手掌移动 · 松开=握拳嵌入'
+        : '鼠标手势模式已激活。操作：按下=食指选中 · 拖动=手掌移动 · 松开=握拳嵌入';
+      gestureStatus.textContent = msg;
+      // 虚拟光标跟随鼠标
+      document.addEventListener('mousemove', onMouseMoveVirtual);
+    }
+
+    function onMouseMoveVirtual(e) {
+      virtualCursor.style.left = e.clientX + 'px';
+      virtualCursor.style.top = e.clientY + 'px';
+    }
+
+    function canUseCamera() {
+      return location.protocol !== 'file:'
+        && navigator.mediaDevices
+        && typeof navigator.mediaDevices.getUserMedia === 'function';
+    }
+
     async function startGesture() {
       if (running) return;
       window.__gestureModelStatus = 'loading';
+
+      // 摄像头不可用 → 直接走鼠标手势回退通道（内置预览 / file:// 环境）
+      if (!canUseCamera()) {
+        startMouseGestureMode(location.protocol === 'file:' ? '摄像头需在 HTTP 环境' : '摄像头不可用');
+        return;
+      }
+
       try {
         gestureBtn.textContent = '加载手势模型…';
         gestureBtn.disabled = true;
         gestureStatus.textContent = '正在检查运行环境…';
-
-        // file:// 协议下 WASM 引擎无法加载（CORS 限制），提前拦截并给出明确提示
-        if (location.protocol === 'file:') {
-          throw new Error(
-            '手势控制必须在 Web 服务器环境下运行。请将本项目部署到 GitHub Pages 或用本地 HTTP 服务器（如 python -m http.server）访问，不能直接双击打开。'
-          );
-        }
 
         gestureStatus.textContent = '正在加载本地手势模型…';
         if (!handLandmarker) {
@@ -981,7 +1010,6 @@
           HAND_CONNECTIONS = vision.HandLandmarker.HAND_CONNECTIONS;
 
           gestureStatus.textContent = '正在初始化手势模型（本地推理引擎）…';
-          // 本地 WASM 路径
           const fileset = await vision.FilesetResolver.forVisionTasks(WASM_LOCAL);
 
           const create = function (delegate) {
@@ -1007,10 +1035,6 @@
           window.__gestureModelStatus = 'ok';
         }
 
-        if (!navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== 'function') {
-          throw new Error('当前环境不支持摄像头（需在 https 或 localhost 环境运行，并允许摄像头权限）');
-        }
-
         gestureStatus.textContent = '正在开启摄像头…';
         stream = await navigator.mediaDevices.getUserMedia({
           video: { width: 640, height: 480, facingMode: 'user' },
@@ -1022,38 +1046,28 @@
         };
         await inputVideo.play();
 
+        gestureMode = 'camera';
         videoPreview.classList.add('active');
         virtualCursor.classList.add('active');
         running = true;
         lastVideoTime = -1;
         gestureBtn.textContent = '关闭手势控制';
         gestureBtn.disabled = false;
-        gestureStatus.textContent = '手势控制已开启';
+        gestureStatus.textContent = '手势控制已开启（摄像头模式）';
         requestAnimationFrame(loop);
       } catch (err) {
-        console.error('手势开启失败：', err);
-        window.__gestureModelStatus = 'error';
-        running = false;
-        gestureBtn.textContent = '开启手势控制';
-        gestureBtn.disabled = false;
-        videoPreview.classList.remove('active');
-        virtualCursor.classList.remove('active');
+        console.error('手势开启失败，回退到鼠标手势模式：', err);
+        // 清理摄像头残留
         if (stream) {
           stream.getTracks().forEach(function (t) { t.stop(); });
           stream = null;
         }
         inputVideo.srcObject = null;
-        if (err && (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError' || /Permission|denied/i.test(err.message || ''))) {
-          gestureStatus.textContent = '摄像头权限被拒绝：请在浏览器地址栏/站点设置中允许摄像头后重试';
-        } else if (err && err.name === 'NotFoundError') {
-          gestureStatus.textContent = '未检测到摄像头设备';
-        } else if (err && err.name === 'NotReadableError') {
-          gestureStatus.textContent = '摄像头被其他程序占用，请关闭占用程序后重试';
-        } else if (err && /Failed to fetch|Importing a module|ERR_|wasm/i.test(err.message || '')) {
-          gestureStatus.textContent = '本地手势资源加载失败（assets/mediapipe 文件缺失），请刷新页面重试';
-        } else {
-          gestureStatus.textContent = '手势开启失败：' + (err && err.message ? err.message : '未知错误');
-        }
+        videoPreview.classList.remove('active');
+
+        // 摄像头失败 → 回退到鼠标手势模式，保证始终可用
+        startMouseGestureMode('摄像头不可用');
+        return;
       } finally {
         if (!running) gestureBtn.disabled = false;
       }
@@ -1061,12 +1075,14 @@
 
     async function stopGesture() {
       running = false;
+      gestureMode = null;
       gestureBtn.textContent = '开启手势控制';
       gestureBtn.disabled = false;
       videoPreview.classList.remove('active');
       virtualCursor.classList.remove('active');
       gestureStatus.textContent = '手势控制未开启';
       videoLabel.textContent = '等待手势…';
+      document.removeEventListener('mousemove', onMouseMoveVirtual);
       if (window.PuzzleDrag) window.PuzzleDrag.cancel();
       if (stream) {
         stream.getTracks().forEach(function (t) { t.stop(); });
