@@ -560,6 +560,7 @@
     <div class="nav-actions">
       <button id="gestureBtn" class="action-btn" type="button">开启手势控制</button>
       <button id="resetBtn" class="action-btn secondary" type="button">重新打乱</button>
+      <button id="openCameraTabBtn" class="action-btn" title="在独立浏览器标签页中打开（内置预览 iframe 可能未授予摄像头权限）">📷 在浏览器中打开</button>
     </div>
   </nav>
 
@@ -880,6 +881,17 @@
       resetBtn.addEventListener('click', resetGame);
       againBtn.addEventListener('click', resetGame);
 
+      // 在独立浏览器标签页中打开（绕过内置预览 iframe 的摄像头权限限制）
+      const openCameraTabBtn = document.getElementById('openCameraTabBtn');
+      if (openCameraTabBtn) {
+        openCameraTabBtn.addEventListener('click', function () {
+          window.open(location.href, '_blank', 'noopener');
+          if (gestureStatus) {
+            gestureStatus.textContent = '已在独立浏览器标签页打开，请在那里允许摄像头权限';
+          }
+        });
+      }
+
       /* ====================== 供手势模块调用的接口 ====================== */
       function trySelectPieceAt(x, y) {
         if (dragState.piece) return;
@@ -987,13 +999,36 @@
         && typeof navigator.mediaDevices.getUserMedia === 'function';
     }
 
+    function isInIframe() {
+      try { return window.self !== window.top; } catch (e) { return true; }
+    }
+
+    // 精确判断摄像头被阻断的原因，用于区分"用户拒绝"与"嵌入预览 iframe 未授予摄像头权限"
+    function categorizeCameraError(err) {
+      const msg = (err && (err.message || err.name)) || '';
+      const notAllowed =
+        (err && (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError'))
+        || /Permission|denied|not.?allowed/i.test(msg);
+      if (notAllowed && isInIframe()) {
+        return 'iframe';      // 内置预览 iframe 未加 allow="camera"，getUserMedia 被 Permission Policy 拦截
+      }
+      if (notAllowed) return 'denied';       // 用户/系统明确拒绝
+      if (err && err.name === 'NotFoundError') return 'no-device';
+      if (err && err.name === 'NotReadableError') return 'busy';
+      return 'other';
+    }
+
+    function openInNewTab() {
+      window.open(location.href, '_blank', 'noopener');
+    }
+
     async function startGesture() {
       if (running) return;
       window.__gestureModelStatus = 'loading';
 
-      // 摄像头不可用 → 直接走鼠标手势回退通道（内置预览 / file:// 环境）
+      // 摄像头接口本身不存在（file:// 或旧浏览器）→ 直接鼠标手势兜底
       if (!canUseCamera()) {
-        startMouseGestureMode(location.protocol === 'file:' ? '摄像头需在 HTTP 环境' : '摄像头不可用');
+        startMouseGestureMode(location.protocol === 'file:' ? 'file:// 环境无摄像头接口' : '当前环境不支持摄像头');
         return;
       }
 
@@ -1056,7 +1091,8 @@
         gestureStatus.textContent = '手势控制已开启（摄像头模式）';
         requestAnimationFrame(loop);
       } catch (err) {
-        console.error('手势开启失败，回退到鼠标手势模式：', err);
+        console.error('摄像头开启失败：', err);
+        const reason = categorizeCameraError(err);
         // 清理摄像头残留
         if (stream) {
           stream.getTracks().forEach(function (t) { t.stop(); });
@@ -1065,8 +1101,27 @@
         inputVideo.srcObject = null;
         videoPreview.classList.remove('active');
 
-        // 摄像头失败 → 回退到鼠标手势模式，保证始终可用
-        startMouseGestureMode('摄像头不可用');
+        if (reason === 'iframe') {
+          // 内置预览 iframe 未授予摄像头权限：给明确说明 + 兜底鼠标手势 + 引导去独立标签页
+          startMouseGestureMode('内置预览未授予摄像头权限');
+          gestureStatus.textContent =
+            '内置预览的 iframe 未授予摄像头权限，无法开启摄像头手势。已切换到鼠标手势（按下=选中 · 拖动=移动 · 松开=嵌入）。'
+            + ' 如需真实摄像头识别，请点击导航栏"在浏览器中打开"后允许摄像头。';
+          videoLabel.textContent = 'iframe 无摄像头权限';
+        } else if (reason === 'denied') {
+          startMouseGestureMode('摄像头权限被拒');
+          gestureStatus.textContent =
+            '摄像头权限被拒绝。请在浏览器地址栏/站点设置中允许摄像头后重试，或继续使用鼠标手势（按下=选中 · 拖动=移动 · 松开=嵌入）。';
+        } else if (reason === 'no-device') {
+          startMouseGestureMode('未检测到摄像头');
+          gestureStatus.textContent = '未检测到摄像头设备，已切换到鼠标手势模式。';
+        } else if (reason === 'busy') {
+          startMouseGestureMode('摄像头被占用');
+          gestureStatus.textContent = '摄像头被其他程序占用，请关闭占用程序后重试；当前已用鼠标手势。';
+        } else {
+          startMouseGestureMode('摄像头开启失败');
+          gestureStatus.textContent = '摄像头开启失败（' + ((err && err.message) || '未知') + '），已切换到鼠标手势。';
+        }
         return;
       } finally {
         if (!running) gestureBtn.disabled = false;
