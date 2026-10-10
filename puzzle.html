@@ -152,9 +152,18 @@
 
     .board-area {
       min-width: 0;
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
     }
 
-    /* Right column: reference on top, progress pinned to bottom */
+    /* 拼图左侧：手势说明面板（独立于拼图框，不遮挡碎片） */
+    .board-area .gesture-hints {
+      flex: 0 0 200px;
+      min-width: 0;
+    }
+
+    /* 右侧列：参考图在上，进度固定在下 */
     .side-column {
       display: flex;
       flex-direction: column;
@@ -253,6 +262,8 @@
 
     /* Board */
     .board-wrap {
+      flex: 1;
+      min-width: 0;
       width: 100%;
       max-width: 1080px;
       margin: 0 auto;
@@ -271,34 +282,33 @@
           inset 0 0 80px rgba(2, 20, 10, 0.5);
       }
 
-    /* 拼图框左上角：手势说明 */
+    /* 拼图左侧：手势说明面板（静态布局，不覆盖碎片） */
     .gesture-hints {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 50;
-      padding: 0.55rem 0.75rem;
-      border-radius: 10px;
-      background: rgba(2, 15, 9, 0.72);
+      position: static;
+      flex: 0 0 200px;
+      padding: 0.85rem 0.95rem;
+      border-radius: 14px;
+      background: var(--glass);
       border: 1px solid rgba(255, 215, 110, 0.25);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      pointer-events: none;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      align-self: flex-start;
+      box-sizing: border-box;
     }
 
     .gesture-hints h3 {
       font-family: "Noto Serif SC", serif;
-      font-size: 0.8rem;
+      font-size: 0.9rem;
       color: var(--gold-300);
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.55rem;
       letter-spacing: 0.06em;
     }
 
     .gesture-hints ul {
       list-style: none;
-      font-size: 0.72rem;
+      font-size: 0.78rem;
       color: var(--green-200);
-      line-height: 1.75;
+      line-height: 1.9;
     }
 
     .gesture-hints .g-name {
@@ -307,7 +317,7 @@
     }
 
     .gesture-hints .g-emoji {
-      margin-right: 0.25rem;
+      margin-right: 0.35rem;
     }
 
     .board-bg {
@@ -519,6 +529,23 @@
         grid-template-columns: 1fr;
       }
 
+      .board-area {
+        flex-direction: column;
+      }
+
+      .board-area .gesture-hints {
+        order: -1;
+        flex: 1 1 auto;
+        width: 100%;
+        max-width: 460px;
+      }
+
+      .gesture-hints ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem 1.25rem;
+      }
+
       .reference-panel {
         width: 100%;
         max-width: 380px;
@@ -566,21 +593,21 @@
 
   <main class="puzzle-layout">
     <section class="board-area">
+    <!-- 拼图左侧：手势说明面板（独立于拼图框，不遮挡任何碎片） -->
+      <div class="gesture-hints">
+        <h3>手势操作说明</h3>
+        <ul>
+          <li><span class="g-emoji">☝️</span><span class="g-name">食指伸出</span>　选中目标碎片</li>
+          <li><span class="g-emoji">🖐️</span><span class="g-name">五指张开</span>　碎片随手掌移动</li>
+          <li><span class="g-emoji">✊</span><span class="g-name">握拳</span>　放下并嵌入碎片</li>
+        </ul>
+      </div>
       <div class="board-wrap">
         <div id="board" class="board">
           <div class="board-bg"></div>
           <div class="board-grid"></div>
           <div id="targetCells"></div>
           <div id="boardPieces"></div>
-          <!-- 拼图框左上角：三种手势说明 -->
-          <div class="gesture-hints">
-            <h3>手势操作说明</h3>
-            <ul>
-              <li><span class="g-emoji">☝️</span><span class="g-name">食指伸出</span>　选中目标碎片</li>
-              <li><span class="g-emoji">🖐️</span><span class="g-name">五指张开</span>　碎片随手掌移动</li>
-              <li><span class="g-emoji">✊</span><span class="g-name">握拳</span>　放下并嵌入碎片</li>
-            </ul>
-          </div>
         </div>
       </div>
     </section>

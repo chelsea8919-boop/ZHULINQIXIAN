@@ -1,5 +1,12 @@
 # 变更日志
 
+## v5.2 - 2026-10-10 16:40
+- 手势操作说明不再悬浮在拼图框左上角（绝对定位会遮挡碎片）：
+  - `board-area` 改为左右 flex 布局：手势说明面板移到拼图**左侧**的独立列（`flex: 0 0 200px`，顶部对齐），拼图占剩余宽度
+  - 面板由 `position: absolute`（z-index 50 覆盖碎片）改为静态独立卡片，`pointer-events` 不再拦截碎片拖拽
+  - 窄屏（≤1100px）时自动改为拼图**上方**的横向排列
+- 变更文件：`puzzle.html`
+
 ## v5.1 - 2026-10-10 15:50
 - 修复"摄像头无法开启"的根本原因——本地手势模型文件损坏：
   - 用无头 Chrome（`--use-fake-device-for-media-stream`）实测整条链路，定位到 `createFromOptions` 阶段报 `Unable to open zip archive`
