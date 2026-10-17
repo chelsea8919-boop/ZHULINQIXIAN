@@ -1,5 +1,16 @@
 # 变更日志
 
+## v5.3 - 2026-10-17 14:30
+- 删除首页"七贤与荣启期"名录的对话功能：
+  - 移除 8 张画像卡片的外层 `<a href="dialogue.html?sage=...">` 链接与"💬 与 XX 对话"角标、"点击任意人物…"提示文案
+  - 清理不再使用的 CSS（`a.sage-card-link` / `.sage-talk` / `.sage-hint`）；画像卡片保留为静态展示
+  - 卡片区块重新规整缩进
+- 摄像头手势"开不起来"排查与加固（`puzzle.html`）：
+  - 用无头 Chrome + 假摄像头实测整条链路（引擎/模型/`getUserMedia`）：本地模型 `hand_landmarker.task` 合法、`vision_bundle.mjs` 无外网依赖，摄像头成功进入"摄像头模式"——**代码本身无回归**
+  - 根因确认：WorkBuddy 内置预览是 iframe，Permission Policy 未授予摄像头，`getUserMedia` 必被拦截；真实摄像头只能在独立标签页 / `http://127.0.0.1` 下使用
+  - 加固：所有"摄像头不可用"分支（iframe / file:// / 拒绝 / 占用 / 通用）统一附"本机 `python run_local.py` → 独立标签打开 http://127.0.0.1:8000/puzzle.html 并允许摄像头"的可操作指引
+- 变更文件：`index.html`、`puzzle.html`
+
 ## v5.2 - 2026-10-10 16:40
 - 手势操作说明不再悬浮在拼图框左上角（绝对定位会遮挡碎片）：
   - `board-area` 改为左右 flex 布局：手势说明面板移到拼图**左侧**的独立列（`flex: 0 0 200px`，顶部对齐），拼图占剩余宽度

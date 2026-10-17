@@ -1026,6 +1026,11 @@
         && typeof navigator.mediaDevices.getUserMedia === 'function';
     }
 
+    // 摄像头不可用时的通用可操作指引（统一文案，避免各分支各说各话）
+    const CAMERA_FIX_HINT =
+      '如需真实摄像头：在本机终端运行 `python run_local.py`，'
+      + '然后用独立浏览器标签打开 http://127.0.0.1:8000/puzzle.html 并允许摄像头权限。';
+
     function isInIframe() {
       try { return window.self !== window.top; } catch (e) { return true; }
     }
@@ -1053,9 +1058,11 @@
       if (running) return;
       window.__gestureModelStatus = 'loading';
 
-      // 摄像头接口本身不存在（file:// 或旧浏览器）→ 直接鼠标手势兜底
+      // 摄像头接口本身不存在（file:// 或旧浏览器）→ 直接鼠标手势兜底 + 给出可操作指引
       if (!canUseCamera()) {
         startMouseGestureMode(location.protocol === 'file:' ? 'file:// 环境无摄像头接口' : '当前环境不支持摄像头');
+        gestureStatus.textContent =
+          gestureStatus.textContent + ' ' + CAMERA_FIX_HINT;
         return;
       }
 
@@ -1149,12 +1156,13 @@
           startMouseGestureMode('内置预览未授予摄像头权限');
           gestureStatus.textContent =
             '内置预览的 iframe 未授予摄像头权限，无法开启摄像头手势。已切换到鼠标手势（按下=选中 · 拖动=移动 · 松开=嵌入）。'
-            + ' 如需真实摄像头识别，请点击导航栏"📷 在浏览器中打开"后允许摄像头。';
+            + ' 如需真实摄像头识别，请点击导航栏"📷 在浏览器中打开"后允许摄像头；' + CAMERA_FIX_HINT;
           videoLabel.textContent = 'iframe 无摄像头权限';
         } else if (reason === 'denied') {
           startMouseGestureMode('摄像头权限被拒');
           gestureStatus.textContent =
-            '摄像头权限被拒绝。请在浏览器地址栏/站点设置中允许摄像头后重试，或继续使用鼠标手势（按下=选中 · 拖动=移动 · 松开=嵌入）。';
+            '摄像头权限被拒绝。请在浏览器地址栏/站点设置中允许摄像头后重试，或继续使用鼠标手势（按下=选中 · 拖动=移动 · 松开=嵌入）。'
+            + (location.protocol === 'file:' ? CAMERA_FIX_HINT : '');
         } else if (reason === 'no-device') {
           startMouseGestureMode('未检测到摄像头');
           gestureStatus.textContent = '未检测到摄像头设备，已切换到鼠标手势模式。';
