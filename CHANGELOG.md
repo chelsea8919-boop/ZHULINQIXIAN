@@ -1,5 +1,12 @@
 # 变更日志
 
+## v5.4 - 2026-10-17 16:55
+- 解决"网址打不开、摄像头开不了"的落地问题——用户环境没有可用的系统 Python（PATH 中 `python` 是 WindowsApps 空壳），此前只能靠终端手动跑 `run_local.py`，实际难以启动：
+  - 新增双击即用入口 `启动预览.bat`：自动探测 Python（`py` launcher → 系统 `python` → WorkBuddy 内置 `.workbuddy/binaries/python/versions/*/python.exe`），启动服务器并自动在浏览器打开拼图页；纯 ASCII 无 BOM，GBK/ANSI 系统均兼容
+  - `run_local.py` 增强：支持 `--open`（启动后自动打开浏览器到 `puzzle.html`）与 `--port`（端口被占用时换端口）
+  - 已用无头 Chrome + 假摄像头在 `http://127.0.0.1:8000/puzzle.html` 实测：本地模型加载成功、摄像头成功进入"摄像头模式"，全链路可用
+- 变更文件：`启动预览.bat`（新增）、`run_local.py`
+
 ## v5.3 - 2026-10-17 14:30
 - 删除首页"七贤与荣启期"名录的对话功能：
   - 移除 8 张画像卡片的外层 `<a href="dialogue.html?sage=...">` 链接与"💬 与 XX 对话"角标、"点击任意人物…"提示文案
