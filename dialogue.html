@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>与名士对话 · 竹林七贤与荣启期</title>
+  <meta name="description" content="竹林七贤与荣启期沉浸式互动对话，选择你的回答，听名士讲述自己的故事" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --green-950: #05311a;
+      --green-900: #074525;
+      --green-800: #0b5a30;
+      --green-700: #10753d;
+      --green-600: #169148;
+      --green-500: #2fb46a;
+      --green-400: #4fd088;
+      --green-300: #8eebae;
+      --green-200: #c5f5d2;
+      --green-100: #e3f8e8;
+      --gold-700: #b8860b;
+      --gold-500: #f2c14e;
+      --gold-400: #ffd76e;
+      --gold-300: #ffe9a6;
+      --text: #f2fdf5;
+      --muted: #b0cbb8;
+      --glass: rgba(255, 255, 255, 0.06);
+      --glass-border: rgba(255, 255, 255, 0.12);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background:
+        radial-gradient(circle at 20% 15%, rgba(47, 180, 106, 0.16), transparent 45%),
+        radial-gradient(circle at 82% 85%, rgba(242, 193, 78, 0.10), transparent 50%),
+        var(--green-950);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.75;
+      overflow-x: hidden;
+    }
+
+    /* ---------- 顶部导航 ---------- */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.85rem 4vw;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background: linear-gradient(180deg, rgba(7, 69, 37, 0.92), rgba(7, 69, 37, 0.42));
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .nav-left { display: flex; align-items: center; gap: 0.85rem; min-width: 0; }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.42rem 0.9rem;
+      border-radius: 999px;
+      border: 1px solid var(--glass-border);
+      color: var(--green-200);
+      text-decoration: none;
+      font-size: 0.85rem;
+      background: var(--glass);
+      transition: background 0.2s ease, color 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .back-link:hover { background: rgba(255, 255, 255, 0.1); color: var(--green-100); }
+
+    .nav-title {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(0.95rem, 2.2vw, 1.2rem);
+      font-weight: 600;
+      color: var(--green-100);
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nav-actions { display: flex; gap: 0.55rem; }
+
+    .ghost-btn {
+      padding: 0.42rem 0.9rem;
+      border-radius: 999px;
+      border: 1px solid rgba(242, 193, 78, 0.45);
+      background: rgba(242, 193, 78, 0.10);
+      color: var(--gold-300);
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s ease, transform 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .ghost-btn:hover { background: rgba(242, 193, 78, 0.22); transform: translateY(-1px); }
+
+    /* ---------- 主容器 ---------- */
+    .stage {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 5.5rem 4vw 3rem;
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    /* ---------- 人物信息栏 ---------- */
+    .sage-panel {
+      position: sticky;
+      top: 5.2rem;
+      border-radius: 18px;
+      overflow: hidden;
+      background: var(--glass);
+      border: 1px solid rgba(242, 193, 78, 0.22);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    }
+
+    .sage-portrait {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      overflow: hidden;
+      background: linear-gradient(180deg, var(--green-900), var(--green-950));
+    }
+
+    .sage-portrait img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: saturate(1.05) contrast(1.03);
+    }
+
+    .sage-portrait::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 50%, rgba(5, 49, 26, 0.92) 100%);
+    }
+
+    .sage-name {
+      position: absolute;
+      left: 1rem;
+      bottom: 0.85rem;
+      z-index: 2;
+      font-family: "Noto Serif SC", serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--green-100);
+      letter-spacing: 0.14em;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.65);
+    }
+
+    .sage-name .sage-alias {
+      display: block;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.6rem;
+      color: var(--gold-300);
+      letter-spacing: 0.14em;
+      margin-top: 0.15rem;
+      text-transform: uppercase;
+    }
+
+    .sage-meta { padding: 0.9rem 1rem 1.1rem; }
+
+    .meta-row {
+      display: flex;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+      margin-bottom: 0.5rem;
+      align-items: flex-start;
+    }
+
+    .meta-label {
+      color: var(--green-300);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      flex: 0 0 3.6em;
+      padding-top: 0.12rem;
+    }
+
+    .meta-value { color: var(--muted); }
+
+    .meta-value.trait {
+      color: var(--gold-300);
+    }
+
+    /* ---------- 对话区 ---------- */
+    .dialogue-area {
+      border-radius: 18px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 1.5rem 1.6rem 1.75rem;
+      min-height: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .progress-track {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .progress-track .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.18);
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .progress-track .dot.done { background: var(--green-400); }
+    .progress-track .dot.current {
+      background: var(--gold-400);
+      box-shadow: 0 0 10px var(--gold-400);
+    }
+
+    .progress-track .track-line {
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.10);
+    }
+
+    .progress-track .step-label {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.68rem;
+      color: var(--green-300);
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+    }
+
+    /* 台词气泡 */
+    .bubble {
+      display: flex;
+      gap: 0.8rem;
+      animation: bubbleIn 0.45s ease both;
+    }
+
+    @keyframes bubbleIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .bubble-avatar {
+      flex: 0 0 40px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 1px solid rgba(242, 193, 78, 0.45);
+      background: var(--green-900);
+    }
+
+    .bubble-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center 22%; }
+
+    .bubble-body { min-width: 0; }
+
+    .bubble-speaker {
+      font-family: "Noto Serif SC", serif;
+      font-size: 0.82rem;
+      color: var(--gold-300);
+      letter-spacing: 0.1em;
+      margin-bottom: 0.28rem;
+    }
+
+    .bubble-text {
+      font-size: 0.98rem;
+      color: var(--green-100);
+      line-height: 1.85;
+      padding: 0.85rem 1.1rem;
+      border-radius: 4px 14px 14px 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-left: 2px solid rgba(142, 235, 174, 0.5);
+    }
+
+    .bubble.user .bubble-text {
+      background: rgba(242, 193, 78, 0.09);
+      border-color: rgba(242, 193, 78, 0.28);
+      border-left-color: var(--gold-400);
+      color: var(--gold-300);
+    }
+
+    .bubble.user .bubble-speaker { color: var(--green-300); }
+
+    .bubble.user .bubble-avatar {
+      border-color: rgba(142, 235, 174, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      color: var(--green-200);
+      background: rgba(47, 180, 106, 0.14);
+    }
+
+    /* 选项 */
+    .choices {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-top: 0.35rem;
+      animation: bubbleIn 0.45s 0.15s ease both;
+    }
+
+    .choice-prompt {
+      font-size: 0.76rem;
+      color: var(--green-300);
+      font-family: "JetBrains Mono", monospace;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.15rem;
+    }
+
+    .choice-btn {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.7rem;
+      width: 100%;
+      text-align: left;
+      padding: 0.8rem 1rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.045);
+      color: var(--green-100);
+      font-family: inherit;
+      font-size: 0.94rem;
+      line-height: 1.6;
+      cursor: pointer;
+      transition: border-color 0.22s ease, background 0.22s ease, transform 0.22s ease;
+    }
+
+    .choice-btn:hover {
+      border-color: rgba(242, 193, 78, 0.55);
+      background: rgba(242, 193, 78, 0.10);
+      transform: translateX(3px);
+    }
+
+    .choice-btn .key {
+      flex: 0 0 1.45rem;
+      height: 1.45rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1px solid rgba(242, 193, 78, 0.5);
+      color: var(--gold-300);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.7rem;
+      margin-top: 0.12rem;
+    }
+
+    /* 继续按钮 */
+    .continue-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 0.2rem;
+    }
+
+    .continue-btn {
+      padding: 0.6rem 1.4rem;
+      border-radius: 999px;
+      border: 1px solid var(--gold-500);
+      background: rgba(242, 193, 78, 0.14);
+      color: var(--green-100);
+      font-family: inherit;
+      font-size: 0.88rem;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: background 0.22s ease, transform 0.22s ease;
+    }
+
+    .continue-btn:hover { background: rgba(242, 193, 78, 0.28); transform: translateY(-1px); }
+
+    /* 知识卡 */
+    .knowledge-card {
+      margin-top: 0.4rem;
+      padding: 1rem 1.15rem;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(242, 193, 78, 0.12), rgba(47, 180, 106, 0.08));
+      border: 1px solid rgba(242, 193, 78, 0.35);
+      animation: bubbleIn 0.5s 0.2s ease both;
+    }
+
+    .knowledge-label {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.66rem;
+      letter-spacing: 0.16em;
+      color: var(--gold-400);
+      text-transform: uppercase;
+      margin-bottom: 0.35rem;
+    }
+
+    .knowledge-title {
+      font-family: "Noto Serif SC", serif;
+      font-size: 1.05rem;
+      color: var(--gold-300);
+      margin-bottom: 0.25rem;
+      letter-spacing: 0.04em;
+    }
+
+    .knowledge-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.5rem;
+    }
+
+    .knowledge-tags span {
+      padding: 0.16rem 0.62rem;
+      border-radius: 999px;
+      background: rgba(47, 180, 106, 0.16);
+      border: 1px solid rgba(142, 235, 174, 0.3);
+      color: var(--green-200);
+      font-size: 0.75rem;
+    }
+
+    /* 时代说明 */
+    .note-box {
+      margin-top: 0.5rem;
+      padding: 0.75rem 0.95rem;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border-left: 2px solid rgba(176, 203, 184, 0.45);
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.7;
+    }
+
+    .note-box strong { color: var(--green-200); font-weight: 500; }
+
+    /* 结束按钮组 */
+    .end-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 0.9rem;
+    }
+
+    .pill-btn {
+      padding: 0.55rem 1.15rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--green-100);
+      font-family: inherit;
+      font-size: 0.85rem;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .pill-btn:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(242, 193, 78, 0.5); }
+
+    .pill-btn.primary {
+      border-color: var(--gold-500);
+      background: rgba(242, 193, 78, 0.16);
+      color: var(--gold-300);
+    }
+
+    .pill-btn.primary:hover { background: rgba(242, 193, 78, 0.3); }
+
+    /* 底部人物切换 */
+    .sage-switcher {
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      justify-content: center;
+    }
+
+    .sage-switcher a {
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      text-decoration: none;
+      color: var(--muted);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.03);
+      transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .sage-switcher a:hover { color: var(--green-100); border-color: rgba(242, 193, 78, 0.4); }
+
+    .sage-switcher a.active {
+      color: var(--gold-300);
+      border-color: rgba(242, 193, 78, 0.6);
+      background: rgba(242, 193, 78, 0.12);
+    }
+
+    /* 未找到人物 */
+    .not-found {
+      text-align: center;
+      padding: 4rem 1rem;
+    }
+
+    .not-found h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: 1.6rem;
+      color: var(--gold-300);
+      margin-bottom: 0.75rem;
+    }
+
+    .not-found p { color: var(--muted); margin-bottom: 1.5rem; }
+
+    /* ---------- 响应式 ---------- */
+    @media (max-width: 860px) {
+      .stage {
+        grid-template-columns: 1fr;
+        padding-top: 5rem;
+      }
+
+      .sage-panel {
+        position: static;
+        display: grid;
+        grid-template-columns: 120px minmax(0, 1fr);
+      }
+
+      .sage-portrait { aspect-ratio: 3 / 4; }
+
+      .sage-name { font-size: 1.15rem; letter-spacing: 0.08em; }
+
+      .dialogue-area { padding: 1.15rem 1.1rem 1.4rem; }
+
+      .bubble-text { font-size: 0.93rem; padding: 0.75rem 0.9rem; }
+    }
+
+    @media (max-width: 560px) {
+      .nav-actions .ghost-btn span.long { display: none; }
+      .sage-panel { grid-template-columns: 96px minmax(0, 1fr); }
+      .meta-row { font-size: 0.74rem; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-left">
+      <a href="index.html#sages" class="back-link">← 返回名录</a>
+      <div class="nav-title" id="navTitle">与名士对话</div>
+    </div>
+    <div class="nav-actions">
+      <button class="ghost-btn" id="restartBtn" type="button">↺ 重新开始</button>
+    </div>
+  </nav>
+
+  <main class="stage" id="stage">
+    <aside class="sage-panel" id="sagePanel"></aside>
+    <section class="dialogue-area" id="dialogue"></section>
+  </main>
+
+  <script>
+    /* ============================================================
+       八位人物对话脚本（依据《人物对话.docx》整理）
+       流程：开场 → 选择一 → 回应 → 故事深化 → 选择二 → 回应 → 结语 → 知识卡
+       ============================================================ */
+    const SAGES = {
+      'ji-kang': {
+        name: '嵇康',
+        alias: 'Ji Kang',
+        title: '临刑奏琴',
+        personality: '清高刚直、不愿屈从',
+        goal: '了解嵇康对自由人格与个人志向的坚守',
+        opening: '你来得正好。世人皆知我爱琴，却未必明白，我为何不愿入仕。我宁愿在山林间打铁抚琴，也不愿受官场规矩束缚。若是你，会如何选择？',
+        q1: { prompt: '你会如何选择？', options: [
+          { text: '追求自由，做自己喜欢的事', reply: '知音难得！人生短暂，若事事违背本心，纵有荣华，又有何乐？' },
+          { text: '入朝为官，实现自己的抱负', reply: '这也未尝不可。只是我生性疏懒，不愿为仕途改变自己。' }
+        ]},
+        deepen: '后来我因事获罪，临刑之时，仍向人借琴，弹奏了一曲《广陵散》。你可知，我为何在最后一刻仍要抚琴？',
+        q2: { prompt: '你如何理解琴声？', options: [
+          { text: '借琴声表达对命运的不屈', reply: '你读懂了我的心意。生死有尽，而人的志向不该轻易改变。' },
+          { text: '想把自己热爱的琴曲留在人间', reply: '琴声确实寄托着我的情怀。只可惜《广陵散》从此难得真传。' }
+        ]},
+        ending: '世间道路千万条，最难的却是守住自己的本心。愿你往后，也能找到属于自己的那一曲。',
+        knowledge: { title: '嵇康与《广陵散》', tags: ['独立人格', '自由精神'] }
+      },
+
+      'ruan-ji': {
+        name: '阮籍',
+        alias: 'Ruan Ji',
+        title: '穷途之哭',
+        personality: '敏感深沉、蔑视礼俗',
+        goal: '理解阮籍看似放纵的行为背后隐藏的内心苦闷',
+        opening: '你可曾漫无目的地走过一段路？我常独自驾车出游，不问去处，只随心而行。可一旦走到无路可走的地方，我便忍不住放声大哭。你猜，这是为何？',
+        q1: { prompt: '猜猜阮籍为何哭泣', options: [
+          { text: '因为道路走不通而伤心', reply: '路断了尚能回头，可人生中的许多困境，又该如何回头呢？' },
+          { text: '因为心中有难以诉说的苦闷', reply: '看来你颇能知我。乱世之中，有些话不能直说，只能寄情于山水。' }
+        ]},
+        deepen: '我也曾胸怀志向，只是世事复杂，想说的话难以开口，想走的路也未必能走通。倘若换作你，遇上无路可走的时候，又会如何？',
+        q2: { prompt: '面对人生困境', options: [
+          { text: '换一条路继续前行', reply: '好！此路虽尽，未必便是人生的尽头。你比我多了几分洒脱。' },
+          { text: '停下来，想清楚自己的方向', reply: '也好。行路不必总是匆忙，有时停下脚步，才能听见自己的心声。' }
+        ]},
+        ending: '我哭的或许不只是一条绝路，更是身处时代的无奈。你若再遇难处，愿你总能找到自己的方向。',
+        knowledge: { title: '阮籍穷途之哭', tags: ['现实困境', '精神自由'] }
+      },
+
+      'shan-tao': {
+        name: '山涛',
+        alias: 'Shan Tao',
+        title: '举荐嵇康',
+        personality: '沉稳宽厚、善于识人',
+        goal: '理解山涛的入世态度及其与嵇康的思想差异',
+        opening: '我与嵇康本是好友。他才华横溢，我一直十分欣赏。后来我准备离任，便想举荐他接替我的官职。本以为是件好事，谁知他竟写来一封绝交书！你觉得他为何如此生气？',
+        q1: { prompt: '嵇康为何拒绝？', options: [
+          { text: '他认为山涛不了解自己的志向', reply: '正是如此。他本就厌恶官场，我却以自己的想法替他安排了前路。' },
+          { text: '他不喜欢承担官职带来的约束', reply: '的确。他向来崇尚自由，宁愿远离朝堂，过自己喜欢的生活。' }
+        ]},
+        deepen: '我选择在朝中做事，他选择远离仕途。我们同样有自己的坚持。若好友与你志向不同，你会如何相处？',
+        q2: { prompt: '如何对待不同志向？', options: [
+          { text: '尊重朋友的选择', reply: '说得好。知己不必事事相同，懂得彼此的志向也很重要。' },
+          { text: '试着解释自己的想法', reply: '诚恳沟通自然重要，但若对方心意已决，也不可一味强求。' }
+        ]},
+        ending: '后来嵇康遇难，仍将自己的儿子托付于我。你看，人生道路虽不同，情谊却未必因此消散。',
+        knowledge: { title: '《与山巨源绝交书》', tags: ['出仕与隐逸', '知己情谊'] }
+      },
+
+      'liu-ling': {
+        name: '刘伶',
+        alias: 'Liu Ling',
+        title: '荷锸随酒',
+        personality: '诙谐放达、不拘礼法',
+        goal: '了解刘伶夸张行为中所体现的魏晋名士风度',
+        opening: '哈哈！你看我这小车，车上有酒，车后还有一个扛铁锹的仆人。我曾告诉他，若我醉死在路旁，便就地埋了！你说，我带着铁锹出门，究竟为了什么？',
+        q1: { prompt: '铁锹背后的秘密', options: [
+          { text: '表达对生死的豁达态度', reply: '哈哈，正是！人生无常，何必时时为生死忧愁？' },
+          { text: '故意做些惊世骇俗的事', reply: '倒也不假！我这般模样，确实常让旁人吃惊。但其中也有我对世俗规矩的不以为然。' }
+        ]},
+        deepen: '我还写过一篇《酒德颂》，借着一个嗜酒之人的形象，嘲讽那些拘泥礼法的人。不过，你可别只学我饮酒的样子！',
+        q2: { prompt: '你如何评价刘伶？', options: [
+          { text: '真正值得理解的是他自由的精神', reply: '妙哉！酒只是故事的表面，率性而活才是我想表达的心境。' },
+          { text: '我还是觉得这样有点太任性', reply: '哈哈，你也有道理！我的行为确实极端，未必值得照着做。' }
+        ]},
+        ending: '世人未必需要像我一般放浪形骸，但偶尔摆脱旁人的眼光，想想自己真正看重什么，也未尝不好！',
+        knowledge: { title: '刘伶与《酒德颂》', tags: ['放达任诞', '反对拘束'] }
+      },
+
+      'ruan-xian': {
+        name: '阮咸',
+        alias: 'Ruan Xian',
+        title: '竹竿晒衣',
+        personality: '率真幽默、不慕虚荣',
+        goal: '通过生活趣事认识阮咸不拘俗礼的处世态度',
+        opening: '今日七夕，族人们都在庭院里晾晒华丽的衣裳，绫罗绸缎，好不热闹！我也凑了个趣，拿竹竿挂上一条粗布短裤。你瞧，这般景象是不是有些滑稽？',
+        q1: { prompt: '阮咸为什么晒短裤？', options: [
+          { text: '你是在嘲讽那些炫耀财富的人吗？', reply: '哈哈，倒也有几分这个意思。衣裳贵贱，又怎能决定人的高低？' },
+          { text: '你难道一点都不觉得难为情？', reply: '这有何难为情？粗布衣裳也是衣裳，何必与别人攀比？' }
+        ]},
+        deepen: '有人问我为何如此，我只说“未能免俗，聊复尔耳”。意思是，我也没能完全摆脱习俗，不过随便应个景罢了。倘若人人都在展示自己的富贵，你会怎么办？',
+        q2: { prompt: '面对攀比与世俗', options: [
+          { text: '不与他人攀比，按自己的方式生活', reply: '正合我意！人生贵在自在，何必处处在意他人的眼光？' },
+          { text: '也参与其中，但不必太过认真', reply: '有趣！习俗原本也是生活的一部分，重要的是别被它束缚。' }
+        ]},
+        ending: '哈哈！今日晒的是粗布短裤，晒出的却是我这份自在。对了，我还精通音律，有机会再与你谈琴！',
+        knowledge: { title: '阮咸晒衣', tags: ['率真自然', '不慕虚荣'] }
+      },
+
+      'xiang-xiu': {
+        name: '向秀',
+        alias: 'Xiang Xiu',
+        title: '闻笛思旧',
+        personality: '重情念旧、善于思辨',
+        goal: '了解向秀与嵇康、吕安的友谊及《思旧赋》的创作背景',
+        opening: '你听，远处传来阵阵笛声……我曾与嵇康、吕安交好，常在山阳相聚。如今故友不在，我再次路过旧居，听见邻人吹笛，往日情景便浮现在眼前。你可曾有过这样的感受？',
+        q1: { prompt: '什么能唤起你的回忆？', options: [
+          { text: '有，一首曲子会让我想起故人', reply: '看来你也懂得。声音虽无形，却能将久远的回忆带回眼前。' },
+          { text: '我更容易被熟悉的地方唤起回忆', reply: '正是。故地依旧，而人事已非，最令人感慨。' }
+        ]},
+        deepen: '嵇康曾在这里打铁，吕安也曾与我们往来。如今熟悉的景物还在，却再难见故人的身影。于是我写下《思旧赋》，将这份哀思留在文字中。',
+        q2: { prompt: '如何留住珍贵的情谊？', options: [
+          { text: '写下文字，让后人记住故友', reply: '不错。文字能记录往事，也能让一段情谊流传后世。' },
+          { text: '把珍贵的回忆留在心中', reply: '情谊不因岁月流逝而消失。只要仍有人记得，故人便不曾被遗忘。' }
+        ]},
+        ending: '笛声渐远，往事却仍在心头。愿你珍惜眼前相伴之人，莫等离别之后，才知相聚可贵。',
+        knowledge: { title: '向秀《思旧赋》', tags: ['故友情谊', '生命感怀'] }
+      },
+
+      'wang-rong': {
+        name: '王戎',
+        alias: 'Wang Rong',
+        title: '道旁苦李',
+        personality: '聪慧敏锐、善于观察',
+        goal: '通过生活推理理解王戎的观察能力和思辨方式',
+        opening: '你来得正巧！我七岁那年，与伙伴们出游，见路边一棵李树结满果实。大家争先恐后去摘，唯独我站着不动。你来猜猜，这是为什么？',
+        q1: { prompt: '推理小测试', options: [
+          { text: '你觉得这些李子一定很酸苦', reply: '答对了！路边的李子若是甜美，来往行人早就摘光了。' },
+          { text: '你担心李树是别人家的', reply: '你的顾虑也有道理。不过我当时想到的，是另一件事：为何满树李子竟无人采摘？' },
+          { text: '你不喜欢吃李子', reply: '哈哈，并非如此！我只是先观察了一番，才得出了自己的判断。' }
+        ]},
+        deepen: '后来伙伴们摘下一尝，果然苦涩难食。我并未亲口尝过，却从周围的情形找到了答案。若你遇到不明白的事，会先怎么做？',
+        q2: { prompt: '你的思考方式', options: [
+          { text: '观察细节，思考其中的原因', reply: '好！善于发现寻常事物中的线索，便能比别人多想一步。' },
+          { text: '亲自尝试，验证自己的想法', reply: '也好！推理之后加以验证，才能知道自己的判断是否正确。' }
+        ]},
+        ending: '聪明不只是知道答案，更要懂得答案从何而来。下次遇见奇怪的事，不妨先问自己一句：为什么？',
+        knowledge: { title: '王戎不取道旁李', tags: ['观察判断', '逻辑思辨'] }
+      },
+
+      'rong-qiqi': {
+        name: '荣启期',
+        alias: 'Rong Qiqi',
+        title: '荣公三乐',
+        personality: '乐观豁达、安贫知足',
+        goal: '理解荣启期的知足思想，以及他与竹林七贤之间的精神联系',
+        opening: '哈哈，远来的客人！我曾衣着简朴，在泰山脚下弹琴而歌。孔子见我如此快乐，便问我有什么值得高兴的事。你瞧，我既无金银财宝，也无显赫官职，你猜我为何快乐？',
+        q1: { prompt: '猜猜荣启期的快乐', options: [
+          { text: '因为你拥有一颗知足的心', reply: '正是！快乐未必来自身外之物，懂得珍惜已有的生活，也是一种福气。' },
+          { text: '因为你过着自由自在的生活', reply: '说得不错！粗茶淡饭、随心而歌，于我而言也是一种自在。' }
+        ]},
+        deepen: '我告诉孔子，自己有三乐：生而为人、身为男子、得享高寿。这是古人看待人生的方式，其中也有那个时代的局限。而今你们看待人生，想必已有不同的想法。那么，对你而言，什么最值得珍惜？',
+        q2: { prompt: '寻找属于你的三乐', options: [
+          { text: '健康平安，珍惜当下', reply: '甚好！能安然度过寻常的一日，何尝不是幸福？' },
+          { text: '自由探索，做自己热爱的事', reply: '妙哉！能从心中所爱寻得快乐，自然也是人生乐事。' },
+          { text: '与亲友相伴，分享生活', reply: '好！快乐因分享而增添滋味，人与人之间的情谊同样可贵。' }
+        ]},
+        ending: '哈哈！你与我所珍视的事物虽有不同，却都在寻找属于自己的快乐。愿你不必等到富贵圆满，也能发现眼前生活的美好。',
+        knowledge: { title: '荣启期三乐', tags: ['知足常乐', '豁达人生'] },
+        note: '荣启期为春秋时代传说人物，并非魏晋竹林七贤成员；南朝《竹林七贤与荣启期》砖画将不同时代的人物并置，是艺术与思想表达，不是八人同席的真实历史记录。其“三乐”中关于性别的古代观念具有时代局限。'
+      }
+    };
+
+    const ORDER = ['ji-kang', 'ruan-ji', 'shan-tao', 'wang-rong', 'xiang-xiu', 'liu-ling', 'ruan-xian', 'rong-qiqi'];
+    const TOTAL_STEPS = 6; // 开场 / 选择1 / 回应1 / 深化 / 选择2 / 回应2 → 结语
+
+    const stageEl = document.getElementById('stage');
+    const panelEl = document.getElementById('sagePanel');
+    const dialogueEl = document.getElementById('dialogue');
+    const navTitle = document.getElementById('navTitle');
+
+    const slug = new URLSearchParams(location.search).get('sage');
+    const sage = SAGES[slug];
+
+    if (!sage) {
+      document.title = '未找到人物 · 竹林七贤';
+      panelEl.remove();
+      stageEl.style.gridTemplateColumns = '1fr';
+      dialogueEl.innerHTML = `
+        <div class="not-found">
+          <h1>未找到这位名士</h1>
+          <p>请从名录中选择一位人物，开始一段对话。</p>
+          <a href="index.html#sages" class="pill-btn primary">← 返回七贤名录</a>
+        </div>`;
+    } else {
+      document.title = `与${sage.name}对话 · 竹林七贤与荣启期`;
+      navTitle.textContent = `与${sage.name}对话`;
+      renderPanel();
+    }
+
+    /* ---------------- 左侧人物信息 ---------------- */
+    function renderPanel() {
+      panelEl.innerHTML = `
+        <div class="sage-portrait">
+          <img src="assets/portraits/${slug}.png" alt="${sage.name}人物画像" />
+          <span class="sage-name">${sage.name}<span class="sage-alias">${sage.alias}</span></span>
+        </div>
+        <div class="sage-meta">
+          <div class="meta-row">
+            <span class="meta-label">SCENE</span>
+            <span class="meta-value">${sage.title}</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">性格</span>
+            <span class="meta-value trait">${sage.personality}</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">看点</span>
+            <span class="meta-value">${sage.goal}</span>
+          </div>
+        </div>`;
+    }
+
+    /* ---------------- 对话流程状态机 ---------------- */
+    const STEPS = ['opening', 'q1', 'reply1', 'deepen', 'q2', 'reply2', 'ending'];
+
+    let stepIndex = 0;      // 0 = 开场
+    let picked = { q1: null, q2: null };
+
+    function reset() {
+      stepIndex = 0;
+      picked = { q1: null, q2: null };
+      dialogueEl.innerHTML = '';
+      renderStep();
+    }
+
+    function progressBar() {
+      const dots = STEPS.map((s, i) => {
+        const cls = i < stepIndex ? 'dot done' : (i === stepIndex ? 'dot current' : 'dot');
+        return `<span class="${cls}"></span>`;
+      });
+      return `
+        <div class="progress-track">
+          <span class="step-label">对话进度</span>
+          <div class="track-line"></div>
+          ${dots.join('')}
+        </div>`;
+    }
+
+    function sageBubble(text) {
+      const div = document.createElement('div');
+      div.className = 'bubble';
+      div.innerHTML = `
+        <div class="bubble-avatar"><img src="assets/portraits/${slug}.png" alt="${sage.name}" /></div>
+        <div class="bubble-body">
+          <div class="bubble-speaker">${sage.name}</div>
+          <div class="bubble-text">${text}</div>
+        </div>`;
+      return div;
+    }
+
+    function userBubble(text) {
+      const div = document.createElement('div');
+      div.className = 'bubble user';
+      div.innerHTML = `
+        <div class="bubble-avatar">你</div>
+        <div class="bubble-body">
+          <div class="bubble-speaker">你</div>
+          <div class="bubble-text">${text}</div>
+        </div>`;
+      return div;
+    }
+
+    function choiceBlock(q, key) {
+      const wrap = document.createElement('div');
+      wrap.className = 'choices';
+
+      const prompt = document.createElement('div');
+      prompt.className = 'choice-prompt';
+      prompt.textContent = q.prompt;
+      wrap.appendChild(prompt);
+
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'choice-btn';
+        btn.innerHTML = `<span class="key">${String.fromCharCode(65 + i)}</span><span>${opt.text}</span>`;
+        btn.addEventListener('click', () => {
+          picked[key] = i;
+          stepIndex++;
+          renderStep();
+        });
+        wrap.appendChild(btn);
+      });
+
+      return wrap;
+    }
+
+    function continueRow(label, onClick) {
+      const row = document.createElement('div');
+      row.className = 'continue-row';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'continue-btn';
+      btn.textContent = label;
+      btn.addEventListener('click', onClick);
+      row.appendChild(btn);
+      return row;
+    }
+
+    function renderStep() {
+      dialogueEl.innerHTML = '';
+      dialogueEl.appendChild(createProgress());
+
+      const step = STEPS[stepIndex];
+
+      if (step === 'opening') {
+        dialogueEl.appendChild(sageBubble(sage.opening));
+        dialogueEl.appendChild(continueRow('听听他的故事 →', () => { stepIndex++; renderStep(); }));
+        return;
+      }
+
+      if (step === 'q1') {
+        dialogueEl.appendChild(sageBubble(sage.opening));
+        dialogueEl.appendChild(choiceBlock(sage.q1, 'q1'));
+        return;
+      }
+
+      if (step === 'reply1') {
+        const opt = sage.q1.options[picked.q1];
+        dialogueEl.appendChild(userBubble(opt.text));
+        dialogueEl.appendChild(sageBubble(opt.reply));
+        dialogueEl.appendChild(continueRow('继续听下去 →', () => { stepIndex++; renderStep(); }));
+        return;
+      }
+
+      if (step === 'deepen') {
+        dialogueEl.appendChild(sageBubble(sage.deepen));
+        dialogueEl.appendChild(continueRow('我来回答 →', () => { stepIndex++; renderStep(); }));
+        return;
+      }
+
+      if (step === 'q2') {
+        dialogueEl.appendChild(sageBubble(sage.deepen));
+        dialogueEl.appendChild(choiceBlock(sage.q2, 'q2'));
+        return;
+      }
+
+      if (step === 'reply2') {
+        const opt = sage.q2.options[picked.q2];
+        dialogueEl.appendChild(userBubble(opt.text));
+        dialogueEl.appendChild(sageBubble(opt.reply));
+        dialogueEl.appendChild(continueRow('听听他的结语 →', () => { stepIndex++; renderStep(); }));
+        return;
+      }
+
+      if (step === 'ending') {
+        const opt = sage.q2.options[picked.q2];
+        dialogueEl.appendChild(sageBubble(sage.ending));
+        dialogueEl.appendChild(knowledgeCard());
+
+        if (sage.note) {
+          const note = document.createElement('div');
+          note.className = 'note-box';
+          note.innerHTML = `<strong>文化说明：</strong>${sage.note}`;
+          dialogueEl.appendChild(note);
+        }
+
+        dialogueEl.appendChild(endActions());
+        dialogueEl.appendChild(switcher());
+      }
+    }
+
+    function createProgress() {
+      const wrapper = document.createElement('div');
+      const dots = STEPS.map((s, i) => {
+        const cls = i < stepIndex ? 'dot done' : (i === stepIndex ? 'dot current' : 'dot');
+        return `<span class="${cls}"></span>`;
+      }).join('');
+      wrapper.innerHTML = `
+        <div class="progress-track">
+          <span class="step-label">对话进度</span>
+          <div class="track-line"></div>
+          ${dots}
+        </div>`;
+      return wrapper.firstElementChild;
+    }
+
+    function knowledgeCard() {
+      const div = document.createElement('div');
+      div.className = 'knowledge-card';
+      div.innerHTML = `
+        <div class="knowledge-label">Unlocked · 解锁知识</div>
+        <div class="knowledge-title">${sage.knowledge.title}</div>
+        <div class="knowledge-tags">${sage.knowledge.tags.map(t => `<span>${t}</span>`).join('')}</div>`;
+      return div;
+    }
+
+    function endActions() {
+      const div = document.createElement('div');
+      div.className = 'end-actions';
+
+      const again = document.createElement('button');
+      again.type = 'button';
+      again.className = 'pill-btn primary';
+      again.textContent = '↺ 再听一次';
+      again.addEventListener('click', reset);
+      div.appendChild(again);
+
+      const nextSlug = ORDER[(ORDER.indexOf(slug) + 1) % ORDER.length];
+      const next = document.createElement('a');
+      next.className = 'pill-btn';
+      next.href = `dialogue.html?sage=${nextSlug}`;
+      next.textContent = `与${SAGES[nextSlug].name}对话 →`;
+      div.appendChild(next);
+
+      const back = document.createElement('a');
+      back.className = 'pill-btn';
+      back.href = 'index.html#sages';
+      back.textContent = '← 返回名录';
+      div.appendChild(back);
+
+      return div;
+    }
+
+    function switcher() {
+      const div = document.createElement('div');
+      div.className = 'sage-switcher';
+      ORDER.forEach(s => {
+        const a = document.createElement('a');
+        a.href = `dialogue.html?sage=${s}`;
+        a.textContent = SAGES[s].name;
+        if (s === slug) a.classList.add('active');
+        div.appendChild(a);
+      });
+      return div;
+    }
+
+    document.getElementById('restartBtn').addEventListener('click', reset);
+
+    if (sage) reset();
+  </script>
+</body>
+</html>

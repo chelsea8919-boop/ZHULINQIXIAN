@@ -449,6 +449,52 @@
       box-shadow: 0 16px 44px rgba(0, 0, 0, 0.4);
     }
 
+    /* 卡片可点击进入对话 */
+    a.sage-card-link {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    a.sage-card-link .sage-talk {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      z-index: 3;
+      padding: 0.3rem 0.7rem;
+      border-radius: 999px;
+      background: rgba(2, 15, 9, 0.78);
+      border: 1px solid rgba(255, 215, 110, 0.4);
+      color: var(--gold-300);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      opacity: 0;
+      transform: translateY(-4px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    a.sage-card-link:hover .sage-talk {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .sage-talk::before {
+      content: "\1F4AC ";
+    }
+
+    .sage-hint {
+      margin-top: 1.25rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+
+    .sage-hint strong {
+      color: var(--gold-300);
+      font-weight: 500;
+    }
+
     .sage-portrait {
       position: relative;
       width: 100%;
@@ -610,63 +656,89 @@
         嵇康、阮籍、山涛、王戎、向秀、刘伶、阮咸，七位魏晋名士，各尽其态，各具风神；旁有荣启期，八人同列于竹林之间。
       </p>
     <div class="sage-cards">
-      <div class="sage-card">
-        <div class="sage-portrait">
-          <img src="assets/portraits/ji-kang.png" alt="嵇康人物画像" loading="lazy" />
-          <span class="sage-name">嵇康<span class="sage-alias">Ji Kang</span></span>
+      <a href="dialogue.html?sage=ji-kang" class="sage-card-link">
+        <div class="sage-card">
+          <span class="sage-talk">与嵇康对话</span>
+          <div class="sage-portrait">
+            <img src="assets/portraits/ji-kang.png" alt="嵇康人物画像" loading="lazy" />
+            <span class="sage-name">嵇康<span class="sage-alias">Ji Kang</span></span>
+          </div>
+          <p class="sage-desc"><span class="sage-trait">抚琴 · 高洁</span>名士之首，广陵散传世绝响，风神超迈，不慕荣利。</p>
         </div>
-        <p class="sage-desc"><span class="sage-trait">抚琴 · 高洁</span>名士之首，广陵散传世绝响，风神超迈，不慕荣利。</p>
-      </div>
-      <div class="sage-card">
-        <div class="sage-portrait">
-          <img src="assets/portraits/ruan-ji.png" alt="阮籍人物画像" loading="lazy" />
-          <span class="sage-name">阮籍<span class="sage-alias">Ruan Ji</span></span>
+      </a>
+      <a href="dialogue.html?sage=ruan-ji" class="sage-card-link">
+        <div class="sage-card">
+          <span class="sage-talk">与阮籍对话</span>
+          <div class="sage-portrait">
+            <img src="assets/portraits/ruan-ji.png" alt="阮籍人物画像" loading="lazy" />
+            <span class="sage-name">阮籍<span class="sage-alias">Ruan Ji</span></span>
+          </div>
+          <p class="sage-desc"><span class="sage-trait">纵酒 · 放达</span>青白眼传世，驾车穷途而哭，以酒避世而怀抱深广。</p>
         </div>
-        <p class="sage-desc"><span class="sage-trait">纵酒 · 放达</span>青白眼传世，驾车穷途而哭，以酒避世而怀抱深广。</p>
-      </div>
-      <div class="sage-card">
-        <div class="sage-portrait">
-          <img src="assets/portraits/shan-tao.png" alt="山涛人物画像" loading="lazy" />
-          <span class="sage-name">山涛<span class="sage-alias">Shan Tao</span></span>
+      </a>
+      <a href="dialogue.html?sage=shan-tao" class="sage-card-link">
+        <div class="sage-card">
+          <span class="sage-talk">与山涛对话</span>
+          <div class="sage-portrait">
+            <img src="assets/portraits/shan-tao.png" alt="山涛人物画像" loading="lazy" />
+            <span class="sage-name">山涛<span class="sage-alias">Shan Tao</span></span>
+          </div>
+          <p class="sage-desc"><span class="sage-trait">推贤 · 稳重</span>识鉴过人，为人推荐后辈而功不居，庙堂林下两相得。</p>
         </div>
-        <p class="sage-desc"><span class="sage-trait">推贤 · 稳重</span>识鉴过人，为人推荐后辈而功不居，庙堂林下两相得。</p>
-      </div>
-      <div class="sage-card">
-        <div class="sage-portrait">
-          <img src="assets/portraits/wang-rong.png" alt="王戎人物画像" loading="lazy" />
-          <span class="sage-name">王戎<span class="sage-alias">Wang Rong</span></span>
+      </a>
+      <a href="dialogue.html?sage=wang-rong" class="sage-card-link">
+        <div class="sage-card">
+          <span class="sage-talk">与王戎对话</span>
+          <div class="sage-portrait">
+            <img src="assets/portraits/wang-rong.png" alt="王戎人物画像" loading="lazy" />
+            <span class="sage-name">王戎<span class="sage-alias">Wang Rong</span></span>
+          </div>
+          <p class="sage-desc"><span class="sage-trait">观棋 · 诙谐</span>竹林观棋，智谋超群；传说尝以青梅掷人，性情机敏。</p>
         </div>
-        <p class="sage-desc"><span class="sage-trait">观棋 · 诙谐</span>竹林观棋，智谋超群；传说尝以青梅掷人，性情机敏。</p>
-      </div>
-      <div class="sage-card">
-        <div class="sage-portrait">
-          <img src="assets/portraits/xiang-xiu.png" alt="向秀人物画像" loading="lazy" />
-          <span class="sage-name">向秀<span class="sage-alias">Xiang Xiu</span></span>
+      </a>
+      <a href="dialogue.html?sage=xiang-xiu" class="sage-card-link">
+        <div class="sage-card">
+          <span class="sage-talk">与向秀对话</span>
+          <div class="sage-portrait">
+            <img src="assets/portraits/xiang-xiu.png" alt="向秀人物画像" loading="lazy" />
+            <span class="sage-name">向秀<span class="sage-alias">Xiang Xiu</span></span>
+          </div>
+          <p class="sage-desc"><span class="sage-trait">注易 · 思辩</span>为《周易》作注，与嵇康共锻于洛阳，玄理精深。</p>
         </div>
-        <p class="sage-desc"><span class="sage-trait">注易 · 思辩</span>为《周易》作注，与嵇康共锻于洛阳，玄理精深。</p>
-      </div>
-      <div class="sage-card">
-        <div class="sage-portrait">
-          <img src="assets/portraits/liu-ling.png" alt="刘伶人物画像" loading="lazy" />
-          <span class="sage-name">刘伶<span class="sage-alias">Liu Ling</span></span>
+      </a>
+      <a href="dialogue.html?sage=liu-ling" class="sage-card-link">
+        <div class="sage-card">
+          <span class="sage-talk">与刘伶对话</span>
+          <div class="sage-portrait">
+            <img src="assets/portraits/liu-ling.png" alt="刘伶人物画像" loading="lazy" />
+            <span class="sage-name">刘伶<span class="sage-alias">Liu Ling</span></span>
+          </div>
+          <p class="sage-desc"><span class="sage-trait">饮酒 · 旷达</span>形貌醺醉而神思清醒，著《酒德颂》，乘车常以悬壶自随。</p>
         </div>
-        <p class="sage-desc"><span class="sage-trait">饮酒 · 旷达</span>形貌醺醉而神思清醒，著《酒德颂》，乘车常以悬壶自随。</p>
-      </div>
-      <div class="sage-card">
-        <div class="sage-portrait">
-          <img src="assets/portraits/ruan-xian.png" alt="阮咸人物画像" loading="lazy" />
-          <span class="sage-name">阮咸<span class="sage-alias">Ruan Xian</span></span>
+      </a>
+      <a href="dialogue.html?sage=ruan-xian" class="sage-card-link">
+        <div class="sage-card">
+          <span class="sage-talk">与阮咸对话</span>
+          <div class="sage-portrait">
+            <img src="assets/portraits/ruan-xian.png" alt="阮咸人物画像" loading="lazy" />
+            <span class="sage-name">阮咸<span class="sage-alias">Ruan Xian</span></span>
+          </div>
+          <p class="sage-desc"><span class="sage-trait">弹阮 · 清逸</span>与叔父阮籍竹林同游，善弹阮咸之器，故后世称此乐器为“阮”。</p>
         </div>
-        <p class="sage-desc"><span class="sage-trait">弹阮 · 清逸</span>与叔父阮籍竹林同游，善弹阮咸之器，故后世称此乐器为"阮"。</p>
-      </div>
-      <div class="sage-card">
-        <div class="sage-portrait">
-          <img src="assets/portraits/rong-qiqi.png" alt="荣启期人物画像" loading="lazy" />
-          <span class="sage-name">荣启期<span class="sage-alias">Rong Qiqi</span></span>
+      </a>
+      <a href="dialogue.html?sage=rong-qiqi" class="sage-card-link">
+        <div class="sage-card">
+          <span class="sage-talk">与荣启期对话</span>
+          <div class="sage-portrait">
+            <img src="assets/portraits/rong-qiqi.png" alt="荣启期人物画像" loading="lazy" />
+            <span class="sage-name">荣启期<span class="sage-alias">Rong Qiqi</span></span>
+          </div>
+          <p class="sage-desc"><span class="sage-trait">旷达 · 乐天</span>春秋时隐士，三乐而忘忧，故七贤砖画特将其并列，寄旷达之意。</p>
         </div>
-        <p class="sage-desc"><span class="sage-trait">旷达 · 乐天</span>春秋时隐士，三乐而忘忧，故七贤砖画特将其并列，寄旷达之意。</p>
-      </div>
+      </a>
     </div>
+    <p class="sage-hint">💬 <strong>点击任意人物</strong>，与其对坐竹林，听 TA 讲述性情与生平故事。</p>
+
     </section>
 
     <section id="visit" class="section">
