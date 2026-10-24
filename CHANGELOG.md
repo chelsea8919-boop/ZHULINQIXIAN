@@ -1,5 +1,14 @@
 # 变更日志
 
+## v5.6 - 2026-10-24 14:25
+- 全面本地化字体、**移除 Google Fonts 外链**，国内网络零境外依赖、打开丝滑：
+  - 下载 Noto Serif SC / Noto Sans SC / JetBrains Mono 全量 woff2 切片（208 个，约 10MB）到 `assets/fonts/`，生成本地 `assets/fonts/fonts.css`（618 个 `@font-face`，全部 `font-display: swap`，`url()` 改相对路径）
+  - `index.html` / `puzzle.html` / `dialogue.html` 删除 `fonts.googleapis.com` 与 `fonts.gstatic.com` 的 preconnect + `<link>`，改为引用本地 `assets/fonts/fonts.css`
+  - 无头浏览器验证：三个页面**外部网络请求为 0**，字体正常渲染
+- 对话界面放大铺满全屏、字体加大：`.stage` 加宽并 `min-height` 撑满视口，气泡/选项/按钮/知识卡/头像字号同步放大
+- 新增 `README.md`（在线访问 / 本地运行 / 目录结构 / 特性说明）
+- 变更文件：`assets/fonts/*`（新增）、`index.html`、`puzzle.html`、`dialogue.html`、`README.md`、`CHANGELOG.md`
+
 ## v5.5 - 2026-10-21 14:50
 - 按《人物对话.docx》重新实现"七贤与荣启期"名录的沉浸式互动对话功能（此前 v5.3 曾移除该功能）：
   - 新增 `dialogue.html`：读取 `?sage=` 参数，展示对应人物画像 + 性格 + 场景，按"开场 → 选择一 → 回应 → 故事深化 → 选择二 → 回应 → 结语 → 解锁知识卡"的七步状态机推进，对话进度点、人物/用户双色气泡、选项 A/B(/C) 按钮、"再听一次/与下一位对话/返回名录"操作
