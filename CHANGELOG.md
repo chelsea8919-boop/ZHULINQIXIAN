@@ -1,5 +1,14 @@
 # 变更日志
 
+## v5.7 - 2026-10-24 17:20
+- 修复"打开线上链接图片加载不出来"：把**所有图片直接打包进 HTML**（base64 内嵌），弱网 / 图片资源请求失败时也能秒开：
+  - 用 Pillow 压缩：`hero-combined` 1400px JPEG q85（2.9MB→352KB），8 张人物画像 720px JPEG q82（~1.5MB/张→~115KB/张）
+  - `index.html` / `puzzle.html` / `dialogue.html` 的 `<img src>` 与 CSS `background-image` 全部替换为 `data:image/jpeg;base64` 内嵌
+  - `dialogue.html` 的动态画像路径改为 `portraitSrc(slug)` 查表（内嵌数据优先，缺 slug 时回退文件路径）
+  - 无头浏览器实测：4 个页面**图片网络请求 = 0**，所有图片走内嵌 data URI
+  - 代价：HTML 体积增大（index ~2MB / puzzle ~1.4MB / dialogue ~1.5MB），但换来零外部图片依赖
+- 变更文件：`index.html`、`puzzle.html`、`dialogue.html`
+
 ## v5.6 - 2026-10-24 14:25
 - 全面本地化字体、**移除 Google Fonts 外链**，国内网络零境外依赖、打开丝滑：
   - 下载 Noto Serif SC / Noto Sans SC / JetBrains Mono 全量 woff2 切片（208 个，约 10MB）到 `assets/fonts/`，生成本地 `assets/fonts/fonts.css`（618 个 `@font-face`，全部 `font-display: swap`，`url()` 改相对路径）
