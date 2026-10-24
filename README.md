@@ -4,7 +4,12 @@
 
 ## 在线访问
 
-- **GitHub Pages**：仓库合并到 Pages 后，通过 `https://<用户名>.github.io/ZHULINQIXIAN/` 在手机 / 电脑浏览器直接打开。
+- **GitHub Pages（已启用）**：手机 / 电脑浏览器直接打开
+  - 首页：https://chelsea8919-boop.github.io/ZHULINQIXIAN/
+  - 互动对话：https://chelsea8919-boop.github.io/ZHULINQIXIAN/dialogue.html
+  - 拼图游戏：https://chelsea8919-boop.github.io/ZHULINQIXIAN/puzzle.html
+  - 全站资源已本地化（含字体），**无境外网络依赖，国内网络直接可用**。
+  - 代码更新后 `git push` 到 master 会自动重新构建上线。
 - 本地打开：双击 `启动预览.bat`（或 `python run_local.py --open`），浏览器进入 `http://127.0.0.1:8000/puzzle.html`。
 
 ## 页面
