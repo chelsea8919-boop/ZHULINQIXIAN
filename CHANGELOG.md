@@ -1,5 +1,12 @@
 # 变更日志
 
+## v5.9 - 2026-11-10 11:35
+- 删除首页瀑布流动效果（保留山水背景静止版），并把**同一幅山水背景应用到全站所有页面**：
+  - `index.html`：移除 `.hero-waterfall` 元素、`waterfallFlow` 动画、`--wf-tile` 变量与 `setWfStep` JS，保留 `.hero-scene` 山水背景（深绿融合不变）
+  - 新增 `assets/site-bg.css`：固定全屏山水背景（`position:fixed; z-index:-1` + 深绿 `multiply` 渐变），三页 `<body>` 均引用；`index/puzzle/dialogue` 统一同一背景
+  - 无头浏览器实测：三页 `.site-bg` 背景图均生效、`hero-waterfall` 元素不存在、无 JS 报错
+- 变更文件：`index.html`、`puzzle.html`、`dialogue.html`、`assets/site-bg.css`（新增）、`CHANGELOG.md`
+
 ## v5.8 - 2026-11-10 10:10
 - 首页 Hero 区新增**山水瀑布场景背景**（`深绿墨韵山水瀑布.png`），与深绿主题融合并让瀑布流动：
   - 背景图压缩为 1600px JPEG q82（约 212KB），以 `background` 铺满 hero，叠加深绿径向/线性渐变 `multiply` 融合，并保留原拼砖画主视觉（缩小至 42vh、半透明 0.82 让山水透出）
