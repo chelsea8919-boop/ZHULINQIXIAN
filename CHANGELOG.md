@@ -1,5 +1,12 @@
 # 变更日志
 
+## v5.8 - 2026-11-10 10:10
+- 首页 Hero 区新增**山水瀑布场景背景**（`深绿墨韵山水瀑布.png`），与深绿主题融合并让瀑布流动：
+  - 背景图压缩为 1600px JPEG q82（约 212KB），以 `background` 铺满 hero，叠加深绿径向/线性渐变 `multiply` 融合，并保留原拼砖画主视觉（缩小至 42vh、半透明 0.82 让山水透出）
+  - 瀑布区域裁出 112×247px 高光贴片，定位在原瀑布位置（左 80.4% / 上 49% / 宽 6.4% / 高 26.6%），用 `mix-blend-mode: screen` + `background-repeat: repeat-y` 垂直滚动，配合上下渐隐 mask，实现水流向下流动；`--wf-step` 由 JS 按元素宽度等比计算，保证无缝循环
+  - 动画 `waterfallFlow` 3.4s linear infinite，无头浏览器实测瀑布 `background-position-y` 持续位移、无 JS 报错
+- 变更文件：`index.html`、`CHANGELOG.md`
+
 ## v5.7 - 2026-10-24 17:20
 - 修复"打开线上链接图片加载不出来"：把**所有图片直接打包进 HTML**（base64 内嵌），弱网 / 图片资源请求失败时也能秒开：
   - 用 Pillow 压缩：`hero-combined` 1400px JPEG q85（2.9MB→352KB），8 张人物画像 720px JPEG q82（~1.5MB/张→~115KB/张）
